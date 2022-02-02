@@ -59,7 +59,7 @@ class readLog:
 
     def run(self):
         totalQueries = 0
-        with open(self.logpath) as infile:
+        with open(self.logpath, 'r', encoding="utf8") as infile:
             self.lineCount=0
             prevSoqlQueriesCount = 0
             grouped = {}

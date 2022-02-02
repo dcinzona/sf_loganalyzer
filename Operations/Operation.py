@@ -1,48 +1,30 @@
-import re
-import Operations.LogData as LogData
-timestampPattern = re.compile("^(?P<time>\d{2}:\d{2}:\d{2}\.)")
+
+import json
+
+from Operations.EntryOrExit import EntryPoints
 
 
 class Operation:
     name:str
-    line:str
+    lines:list[str] = []
     lineNumber:int = 0
-    lineSplit:list = []
-    timeStamp:str
-    eventType:str
-    eventId:str
-    eventSubType:str
-    operations:list = []
+    tokens:list[str] = []
+    timeStamp:str = None
+    eventType:str = None
+    eventId:str = None
+    eventSubType:str = None
+    operationAction:str = ''
+    tokensLength:int = len(tokens)
 
+    def __init__(self, tokens:list[str], lineNumber:int):
+        self.name = tokens[-1]
+        self.operationAction = tokens[1]
+        self.lineNumber = lineNumber
+        self.tokens = tokens
+        linestr = '|'.join(tokens)
+        self.lines.append(linestr)
+        self.timeStamp = self.tokens[0] if self.timeStamp is None else self.timeStamp
+        self.tokensLength = len(tokens)
 
-class LogLine(Operation):
-
-    def __init__(self, lineString:str, parentOperation:Operation=None):
-        Operation.lineNum += 1
-        isValid, line = self.isValidLine(lineString.strip())
-        if(isValid):
-            self.line = line
-            self.lineSplit = line.split("|")
-            self.lineNumber = Operation.lineNumber
-            self.timeStamp = self.lineSplit[0]
-            self.eventType = self.lineSplit[1]
-            self.eventId = self.lineSplit[2]
-            self.eventSubType = self.lineSplit[3]
-            parentOperation.operations.append(self) if parentOperation else None
-            LogData.logReversed.insert(0, self)
-
-    
-    def isValidLine(self, line):
-        isValid = timestampPattern.match(line) is not None and line.find('|') != -1
-        return isValid,line
-
-class SOQLQueryLogLine(LogLine):
-
-    SEARCH_STRING = "SOQL queries"
-
-    def isValidLine(self, line):
-        isValid = timestampPattern.match(line) is not None and line.find('|Validation:') == -1
-        prevLine = LogData.logReversed[0] if len(LogData.logReversed) >= 1 else ''
-        if(isValid == False and line.find(self.SEARCH_STRING) != -1 and prevLine.endswith('|LIMIT_USAGE_FOR_NS|(default)|')):
-            return True, f'{prevLine}{line}'
-        return isValid,line
+    def print(self):
+        print(json.dumps(self.__dict__, indent=4, sort_keys=True))

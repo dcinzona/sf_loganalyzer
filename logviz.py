@@ -4,21 +4,22 @@ Requires Python 3.6 or higher
 """
 import os,sys,re,traceback
 
-from Operations.Operation import Operation
+from logfileReader import reader
 
 
 class logviz:
     def run(self):
-        pass
+        self.file = reader(sys.argv[1])
+        self.file.read()
 
 
 if __name__ == "__main__":
     if(len(sys.argv) != 2 and len(sys.argv) != 3):
         print("Usage: logviz.py <logfile> [optional:outputfile]")
         sys.exit()
-    reader = logviz()
+    runner = logviz()
     try:
-        reader.run()
+        runner.run()
     except Exception as e:
         print(f"\n== Error ==\n{e}\n")
         traceback.print_exc()
