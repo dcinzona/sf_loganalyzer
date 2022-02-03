@@ -28,9 +28,13 @@ class OperationFactory():
                     operation = FlowOperation(logLine);
             elif(tokens[1].startswith("CODE_UNIT_")):
                 #Check if this is a trigger
-                if(tokens[-1].find("trigger")>-1):
+                last:str = tokens[-1]
+                if(last.find("trigger")>-1):
                     #this is a trigger code execution
                     operation = TriggerOperation(logLine)
+                elif(last.startswith(('Workflow:', 'Flow:'))):
+                    #this is a flow code execution
+                    operation = FlowOperation(logLine)
                 else:
                     operation = MethodOperation(logLine)
                 

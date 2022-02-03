@@ -8,9 +8,10 @@ from logfileReader import reader
 
 
 class logviz:
+    reader=None
     def run(self):
-        self.file = reader(sys.argv[1])
-        self.file.read()
+        self.reader = reader(sys.argv[1])
+        self.reader.read()
 
 
 if __name__ == "__main__":
@@ -23,5 +24,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n== Error ==\n{e}\n")
         traceback.print_exc()
-        print(f"\nLast Line: {reader.lineCount}\n {reader.logReversed[1]}\n {reader.logReversed[0]}")
+        print(f"\nLast Line: {runner.reader.lineCount}\n {runner.reader.logReversed[1]}\n {runner.reader.logReversed[0]}")
         sys.exit(1)

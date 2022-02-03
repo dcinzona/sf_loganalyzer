@@ -3,7 +3,6 @@ Run via command line: python3 readlog.py [logfile] [optional:outputfilecsv]
 Requires Python 3.6 or higher
 """
 import os,sys,re,traceback
-import Operations.Operation as Operation
 """
 15:05:12.412 (20450194753)|CODE_UNIT_STARTED|[EXTERNAL]|Flow:01Ir0000000HCxR
 15:05:12.412 (20747809148)|CODE_UNIT_STARTED|[EXTERNAL]|Workflow:01Ir0000000HCxE
