@@ -1,5 +1,5 @@
 ## SOQL Query counter ##
-Processes a log and counts the number of SOQL queries from FLOWS and Apex.  
+Processes a log and counts the number of SOQL queries from Flows and Apex.  
 
 Outputs to CSV.
 command: `py readlog.py [logfile] [optional:outputFile]`
