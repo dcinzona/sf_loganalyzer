@@ -1,5 +1,6 @@
 
 import json
+from pprint import pp
 
 from Operations.EntryOrExit import EntryPoints
 
@@ -38,7 +39,7 @@ class Operation:
     operations:list = []
 
     def __init__(self, tokens:list[str], lineNumber:int):
-        self.name = tokens[-1]
+        self.name = None #tokens[-1]
         self.operationAction = tokens[1]
         self.lineNumber = lineNumber
         linestr = '|'.join(tokens)
@@ -49,4 +50,6 @@ class Operation:
         self.limits = LimitData()
 
     def print(self):
-        print(json.dumps(self, default=lambda x: x.__dict__, indent=4, sort_keys=True))
+        #print(json.dumps(self, default=lambda x: x.__dict__, indent=4, sort_keys=True))
+
+        pp(f'[{self.lineNumber}] {self.eventType}|{self.name}')

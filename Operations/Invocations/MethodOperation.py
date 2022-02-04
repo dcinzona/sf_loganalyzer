@@ -32,6 +32,7 @@ class MethodOperation(Operation):
             Operation.OPSTACK.pop() if len(Operation.OPSTACK) > 0 else None
             prev = MethodOperation.METHODSTACK.pop() if len(MethodOperation.METHODSTACK) > 0 else None
             if(prev is None):
-                pp(self.name)
+                #pp(self.name)
+                self.print()
             else:
-                pp(self.name) if self.name != prev.name else None
+                self.print() if self.name != prev.name else None

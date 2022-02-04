@@ -24,20 +24,23 @@ class FlowOperation(Operation):
             self.eventType = self.getFlowType(tokens)
             self.eventSubType = tokens[-1]
             Operation.OPSTACK.append(self)
+            FlowOperation.FLOW_STACK.append(self)
         else:
-            flowOp = Operation.OPSTACK[-1] if len(Operation.OPSTACK) > 0 else None
+            flowOp = FlowOperation.FLOW_STACK[-1] if len(FlowOperation.FLOW_STACK) > 0 else None
             self = flowOp if flowOp is not None else self
         if(tokens[1].startswith("FLOW_CREATE_INTERVIEW_END")):
             # 15:09:38.105 (6113904308)|FLOW_CREATE_INTERVIEW_END|Flow Unique ID|Flow Name
             self.eventId = tokens[2]
             self.eventSubType = tokens[-1]
+            self.name = tokens[-1]
         if(tokens[1].startswith("FLOW_START_INTERVIEW_BEGIN")):
             # Entering a flow
             # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_BEGIN|Flow Unique ID|Flow Name
             # If FLOW_CREATE_INTERVIEW_BEGIN is seen before FLOW_START_INTERVIEW_END, a sub-flow was called
             #self.eventType = self.getFlowType()
-            self.name = tokens[-1]
+            #self.name = tokens[-1]
             #self.eventSubType = tokens[-1]
+            pass
         if(tokens[1].startswith(('FLOW_START_INTERVIEW_END'))):
             # Exiting a flow
             # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_END|Flow Unique ID|Flow Name
@@ -47,13 +50,12 @@ class FlowOperation(Operation):
             #self.setFlowLimitUsage(tokens)
             pass
         if(tokens[1] == "CODE_UNIT_FINISHED" and tokens[-1].startswith(('Flow:','Workflow:'))):
-            lastFlow = Operation.OPSTACK.pop()
-            parentFlow = Operation.OPSTACK[-1] if len(Operation.OPSTACK) > 0 else None
+            lastFlow = FlowOperation.FLOW_STACK.pop()
+            parentFlow = FlowOperation.FLOW_STACK[-1] if len(FlowOperation.FLOW_STACK) > 0 else None
             if(parentFlow is not None):
                 parentFlow.operations.insert(0,self.__dict__)
                 ll.stackOperation = parentFlow.__dict__
-            
-            pp(self.name)
+            self.print()
     
     def getFlowType(self, tokens:list=None):
         if(len(tokens)) == 4:

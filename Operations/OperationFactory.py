@@ -29,7 +29,7 @@ class OperationFactory():
             elif(tokens[1].startswith("CODE_UNIT_")):
                 #Check if this is a trigger
                 last:str = tokens[-1]
-                if(last.find("trigger")>-1):
+                if(last.startswith("__sfdc_trigger")):
                     #this is a trigger code execution
                     operation = TriggerOperation(logLine)
                 elif(last.startswith(('Workflow:', 'Flow:'))):
