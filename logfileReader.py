@@ -1,6 +1,8 @@
+from pprint import pp
 import sys, os, re, traceback
 from Operations.LogData import LogData
 from Operations.LogLine import LogLine
+from Operations.Operation import Operation
 from Operations.OperationFactory import OperationFactory
 
 
@@ -27,8 +29,10 @@ class reader:
                 if(isValid):
                     self.logReversed.insert(0, line)
                     ll = LogLine(line, self.lineCount)
-                    ll.stackOperation = LogData().getStack().peek() if LogData().getStack().is_empty() == False else None
-                    ll.operation = OperationFactory.createOperation(ll)
-                    if(ll.operation and ll.operation.name):
-                        
-                        pass
+                    # ll.stackOperation = LogData().getStack().peek() if LogData().getStack().is_empty() == False else None
+                    op = OperationFactory.createOperation(ll)
+        
+        for op in [f'[{x["lineNumber"]}] {x["eventType"]} | {x["name"]}' for x in Operation.OPSTACK]:
+            #pp(op.__dict__)
+            pp(op)
+        print(len(Operation.OPSTACK))

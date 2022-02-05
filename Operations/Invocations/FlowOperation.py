@@ -1,61 +1,86 @@
 import json
 from pprint import pp
-from unicodedata import name
 from Operations.LogLine import LogLine
-from Operations.Operation import Operation, kLimit
+from Operations.Operation import Operation
 
     
     
 class FlowOperation(Operation):
 
-    FLOW_STACK:list[Operation] = []
+    LOCAL_STACK:list = []
+    FLOW_WITH_LIMITS = None
+    CREATE_INTERVIEW_TYPE:str = None
+
     # have to check the previous line to determine if this is a flow or a process builder
     # seems like process builders all have the last element in the previous line starting with 301r
     # flows don't have that last element, so they start with 300r
     def __init__(self, ll:LogLine):
-        super().__init__(ll.lineSplit, ll.lineNumber)
+        super().__init__(ll)
         tokens = ll.lineSplit
-        tokens.pop() if tokens[-1] == '' else None
+        if(len(tokens[-1]) == 0):
+            tokens.pop()
+            self.eventType = 'FLOW'
+        #tokens.pop() if tokens[-1] == '' else None
+        if(tokens[1] == 'CODE_UNIT_STARTED'):
+            self.name = tokens[-1]
+            self.eventType = 'FLOW_WRAPPER'
+            #FlowOperation.LOCAL_STACK.append(self)
+            return
         if(tokens[1] == "FLOW_CREATE_INTERVIEW_BEGIN"):
             # Visual Flow
             # 15:09:38.105 (6113840972)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oD9|
             # Process Builder
             # 15:09:38.310 (6310353162)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oDh|301r0000000kzyr
-            self.eventType = self.getFlowType(tokens)
-            self.eventSubType = tokens[-1]
-            Operation.OPSTACK.append(self)
-            FlowOperation.FLOW_STACK.append(self)
-        else:
-            flowOp = FlowOperation.FLOW_STACK[-1] if len(FlowOperation.FLOW_STACK) > 0 else None
-            self = flowOp if flowOp is not None else self
-        if(tokens[1].startswith("FLOW_CREATE_INTERVIEW_END")):
+            FlowOperation.FLOW_WITH_LIMITS = None
+            FlowOperation.CREATE_INTERVIEW_TYPE = self.getFlowType(tokens)
+            self.eventType = 'FLOW_WRAPPER'
+            
+        if(self.operationAction == "FLOW_CREATE_INTERVIEW_END"):
             # 15:09:38.105 (6113904308)|FLOW_CREATE_INTERVIEW_END|Flow Unique ID|Flow Name
             self.eventId = tokens[2]
-            self.eventSubType = tokens[-1]
             self.name = tokens[-1]
-        if(tokens[1].startswith("FLOW_START_INTERVIEW_BEGIN")):
-            # Entering a flow
-            # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_BEGIN|Flow Unique ID|Flow Name
-            # If FLOW_CREATE_INTERVIEW_BEGIN is seen before FLOW_START_INTERVIEW_END, a sub-flow was called
-            #self.eventType = self.getFlowType()
-            #self.name = tokens[-1]
-            #self.eventSubType = tokens[-1]
-            pass
-        if(tokens[1].startswith(('FLOW_START_INTERVIEW_END'))):
-            # Exiting a flow
-            # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_END|Flow Unique ID|Flow Name
-            pass
+            self.eventType = FlowOperation.CREATE_INTERVIEW_TYPE
+            self.appendToStack(self.__dict__)
+
+        if(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN",'FLOW_INTERVIEW_FINISHED']):
+            d,i = FlowOperation.getFlowFromStack(tokens[2])
+            if(d is not None):
+                for key in d:
+                    self.__setattr__(key, d.get(key))
+                if(tokens[1] == 'FLOW_INTERVIEW_FINISHED'):
+                    FlowOperation.LOCAL_STACK.pop(i)
+            else:
+                pp(FlowOperation.LOCAL_STACK)
+                raise Exception(f'{tokens[2]} not found in stack')
+            FlowOperation.FLOW_WITH_LIMITS = self.__dict__
+            
         if(tokens[1].endswith("_LIMIT_USAGE")):
             # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_LIMIT_USAGE|Flow Unique ID|Flow Name
-            #self.setFlowLimitUsage(tokens)
-            pass
-        if(tokens[1] == "CODE_UNIT_FINISHED" and tokens[-1].startswith(('Flow:','Workflow:'))):
-            lastFlow = FlowOperation.FLOW_STACK.pop()
-            parentFlow = FlowOperation.FLOW_STACK[-1] if len(FlowOperation.FLOW_STACK) > 0 else None
-            if(parentFlow is not None):
-                parentFlow.operations.insert(0,self.__dict__)
-                ll.stackOperation = parentFlow.__dict__
-            self.print()
+            if(FlowOperation.FLOW_WITH_LIMITS is not None):
+                for key in FlowOperation.FLOW_WITH_LIMITS:
+                    self.__setattr__(key, FlowOperation.FLOW_WITH_LIMITS.get(key))
+                self.setFlowLimitUsage(tokens)
+
+
+    @classmethod
+    def appendToStack(cls, d:dict):
+        cls.LOCAL_STACK.append(d)
+
+    @classmethod
+    def getFlowFromStack(cls,eventId:str):
+        if(len(cls.LOCAL_STACK) == 0):
+            return None, None
+        for i in range(len(cls.LOCAL_STACK)):
+            d = cls.LOCAL_STACK[i]
+            if(d.get('eventId') == eventId):
+                return d, i
+        return None, None
+
+        
+    
+    def print(self):
+        Operation.print(self)
+
     
     def getFlowType(self, tokens:list=None):
         if(len(tokens)) == 4:
