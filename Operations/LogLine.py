@@ -1,8 +1,10 @@
 
 from Operations.LogData import LogData
 import re
+
+from Operations.OpUtils import dynamicDict
 timestampPattern = re.compile("^(?P<time>\d{2}:\d{2}:\d{2}\.)")
-class LogLine():
+class LogLine(object):
     operation = None
     stackOperation = None
     def __init__(self, lineString:str, lineNumber:int=0):

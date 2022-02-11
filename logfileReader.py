@@ -32,7 +32,6 @@ class reader:
                     # ll.stackOperation = LogData().getStack().peek() if LogData().getStack().is_empty() == False else None
                     op = OperationFactory.createOperation(ll)
         
-        for op in [f'[{x["lineNumber"]}] {x["eventType"]} | {x["name"]}' for x in Operation.OPSTACK]:
-            #pp(op.__dict__)
-            pp(op)
+        for op in [f'[{x["lineNumber"]}] {x["eventType"]} | {x["name"]}' for x in sorted(Operation.OPSTACK, key=lambda x: x["lineNumber"])]:
+            print(op)
         print(len(Operation.OPSTACK))

@@ -1,58 +1,51 @@
 import json
 from pprint import pp
 from Operations.LogLine import LogLine
+from Operations.OpUtils import dynamicDict
 from Operations.Operation import Operation
 
     
     
 class FlowOperation(Operation):
 
-    LOCAL_STACK:list = []
+    FLOWSTACK:list = []
+    LAST_OPERATION:dict = None
     FLOW_WITH_LIMITS = None
     CREATE_INTERVIEW_TYPE:str = None
+    CURRENT_FLOW = None
 
     # have to check the previous line to determine if this is a flow or a process builder
     # seems like process builders all have the last element in the previous line starting with 301r
     # flows don't have that last element, so they start with 300r
     def __init__(self, ll:LogLine):
-        super().__init__(ll)
-        tokens = ll.lineSplit
+        #super().__init__(ll)
+        tokens = ll.lineSplit        
+        self.line = ll.line
+        self.lineSplit = ll.lineSplit
         if(len(tokens[-1]) == 0):
             tokens.pop()
             self.eventType = 'FLOW'
         #tokens.pop() if tokens[-1] == '' else None
         if(tokens[1] == 'CODE_UNIT_STARTED'):
-            self.name = tokens[-1]
-            self.eventType = 'FLOW_WRAPPER'
-            #FlowOperation.LOCAL_STACK.append(self)
-            return
-        if(tokens[1] == "FLOW_CREATE_INTERVIEW_BEGIN"):
-            # Visual Flow
-            # 15:09:38.105 (6113840972)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oD9|
-            # Process Builder
-            # 15:09:38.310 (6310353162)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oDh|301r0000000kzyr
-            FlowOperation.FLOW_WITH_LIMITS = None
-            FlowOperation.CREATE_INTERVIEW_TYPE = self.getFlowType(tokens)
-            self.eventType = 'FLOW_WRAPPER'
-            
-        if(self.operationAction == "FLOW_CREATE_INTERVIEW_END"):
-            # 15:09:38.105 (6113904308)|FLOW_CREATE_INTERVIEW_END|Flow Unique ID|Flow Name
-            self.eventId = tokens[2]
-            self.name = tokens[-1]
-            self.eventType = FlowOperation.CREATE_INTERVIEW_TYPE
-            self.appendToStack(self.__dict__)
+            self.codeUnitStarted(tokens)
+        elif(tokens[1] == "FLOW_CREATE_INTERVIEW_BEGIN"):
+            self.flowCreateInterviewBegin(tokens)
+        elif(tokens[1] == "FLOW_CREATE_INTERVIEW_END"):
+            self.flowCreateInterviewEnd(tokens, ll.lineNumber)
 
-        if(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN",'FLOW_INTERVIEW_FINISHED']):
-            d,i = FlowOperation.getFlowFromStack(tokens[2])
+        elif(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN",'FLOW_INTERVIEW_FINISHED']):
+            d,i = self.getFlowFromStack(tokens[2])
             if(d is not None):
-                for key in d:
-                    self.__setattr__(key, d.get(key))
+                # for key in d:
+                #     self.__setattr__(key, d.get(key))
                 if(tokens[1] == 'FLOW_INTERVIEW_FINISHED'):
-                    FlowOperation.LOCAL_STACK.pop(i)
+                    FlowOperation.LAST_OPERATION = FlowOperation.FLOWSTACK.pop(i)
             else:
-                pp(FlowOperation.LOCAL_STACK)
+                pp(FlowOperation.FLOWSTACK)
                 raise Exception(f'{tokens[2]} not found in stack')
             FlowOperation.FLOW_WITH_LIMITS = self.__dict__
+            FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
+        
             
         if(tokens[1].endswith("_LIMIT_USAGE")):
             # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_LIMIT_USAGE|Flow Unique ID|Flow Name
@@ -60,24 +53,70 @@ class FlowOperation(Operation):
                 for key in FlowOperation.FLOW_WITH_LIMITS:
                     self.__setattr__(key, FlowOperation.FLOW_WITH_LIMITS.get(key))
                 self.setFlowLimitUsage(tokens)
+                FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
 
+    def appendToStack(self):
+        FlowOperation.FLOWSTACK.append(self.__dict__.copy())
 
-    @classmethod
-    def appendToStack(cls, d:dict):
-        cls.LOCAL_STACK.append(d)
-
-    @classmethod
-    def getFlowFromStack(cls,eventId:str):
-        if(len(cls.LOCAL_STACK) == 0):
-            return None, None
-        for i in range(len(cls.LOCAL_STACK)):
-            d = cls.LOCAL_STACK[i]
-            if(d.get('eventId') == eventId):
-                return d, i
+    def getFlowFromStack(self,eventId:str):
+        for i in range(len(FlowOperation.FLOWSTACK)):
+            d = dynamicDict(FlowOperation.FLOWSTACK[i])
+            try:
+                if(d.eventId == eventId):
+                    self.update(d.__dict__)
+                    return d, i
+            except Exception as e:
+                pp(d)
+                raise e
+        if(FlowOperation.LAST_OPERATION is not None and FlowOperation.LAST_OPERATION.eventId == eventId):
+            FlowOperation.FLOWSTACK.append(FlowOperation.LAST_OPERATION)
+            return FlowOperation.LAST_OPERATION, len(FlowOperation.FLOWSTACK) - 1
         return None, None
 
-        
+    def codeUnitStarted(self, tokens:list=None):
+        self.name = tokens[-1]
+        self.eventType = 'FLOW_WRAPPER'
+        #FlowOperation.FLOWSTACK.append(self)
     
+    
+    def flowCreateInterviewBegin(self, tokens:list=None):
+        FlowOperation.LAST_OPERATION = None
+        """
+        Description: Used to identify whether flow is a process builder or a flow
+        """
+        # Visual Flow
+        # 15:09:38.105 (6113840972)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oD9|
+        # Process Builder
+        # 15:09:38.310 (6310353162)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oDh|301r0000000kzyr
+        FlowOperation.FLOW_WITH_LIMITS = None
+        FlowOperation.CREATE_INTERVIEW_TYPE = self.getFlowType(tokens)
+        self.eventType = 'FLOW_WRAPPER'
+        self.appendToStack()
+    
+    def flowCreateInterviewEnd(self, tokens:list=None, lineNumber:int=None):
+        """
+        Description: Sets the unique ID of the flow interview
+        """
+        # 15:09:38.105 (6113904308)|FLOW_CREATE_INTERVIEW_END|Flow Unique ID|Flow Name
+        if(len(FlowOperation.FLOWSTACK) > 0):
+            f = dynamicDict(FlowOperation.FLOWSTACK[-1])
+            if(f.eventType == 'FLOW_WRAPPER'):
+                FlowOperation.CURRENT_FLOW = FlowOperation.FLOWSTACK.pop()
+            else:
+                FlowOperation.CURRENT_FLOW = f.__dict__.copy()
+        else:
+            raise Exception("No flows in the stack.  This is a bug")
+        
+        self.update(FlowOperation.CURRENT_FLOW)
+        self.eventId = tokens[2]
+        self.name = tokens[-1]
+        self.eventType = FlowOperation.CREATE_INTERVIEW_TYPE
+        self.eventSubType = 'FLOW_CREATE_INTERVIEW_END'
+        self.lineNumber = lineNumber # if self.lineNumber is None else self.lineNumber
+        self.appendToStack()
+    
+    
+
     def print(self):
         Operation.print(self)
 
@@ -109,3 +148,5 @@ class FlowOperation(Operation):
             limitValue = limitArray[1].strip().split('out of')[0].strip()
             limitMax = limitArray[1].strip().split('out of')[1].strip()
             self.limits.addLimit(start=operationAction.startswith('FLOW_START_INTERVIEW_'), key=limitName, val={'_used':limitValue, 'out_of':limitMax})
+
+

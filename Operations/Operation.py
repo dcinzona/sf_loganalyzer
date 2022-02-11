@@ -4,7 +4,8 @@ import json
 from pprint import pp
 
 import traceback
-from Operations.EntryOrExit import EntryPoints
+from Operations.EntryOrExit import EntryOrExit, EntryPoints, ExitPoints
+from Operations.OpUtils import dynamicDict
 
 class kLimit:
     value:int = 0
@@ -27,7 +28,7 @@ class LimitData:
             self.endlimits[key] = val
 
 
-class Operation(object):
+class Operation(dynamicDict):
     OPSTACK:list = []
     name:str = ''
     lines:list[str] = []
@@ -40,6 +41,7 @@ class Operation(object):
     #tokensLength:int = 0
     limits:LimitData = LimitData()
     operations:list = []
+    LAST_OPERATION:dict = None
 
     def __init__(self, ll):
         #self.name = None #tokens[-1]
@@ -49,6 +51,25 @@ class Operation(object):
         linestr = ll.line
         self.lines.append(linestr)
         self.timeStamp = tokens[0] if self.timeStamp is None else self.timeStamp
+       
+
+    def updateData(self, opDict:dict):        
+        self.update(opDict)
+
+
+    def isEntry(self):
+        return self.operationAction in EntryPoints.ENTRY_POINTS
+        
+    def isExit(self):
+        return self.operationAction in ExitPoints.EXIT_POINTS
+
+    @classmethod
+    def getLastOperation(cls)->dict:
+        return cls.LAST_OPERATION
+
+    @classmethod
+    def setLastOperation(cls, opDict:dict)->dict:
+        cls.LAST_OPERATION = opDict
 
     @staticmethod
     def print(cls, msg=None):
@@ -78,11 +99,11 @@ class Operation(object):
                         #     return sop,i
                     except Exception:
                         print(traceback.format_exc())
-                        print(op.__dict__)
+                        print(op)
                         pp(stack[i])
                         exit()
-        print(f'{op.name} not found in stack')
+        print(f'{op.name} not found in stack :(')
         pp(stack)
-        pp(op.__dict__)
+        pp(op)
         return None
 

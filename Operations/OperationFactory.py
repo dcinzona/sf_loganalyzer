@@ -44,29 +44,50 @@ class OperationFactory():
                     pass
                     # operation = MethodOperation(logLine)
 
-
+        #The operation here is based on the log line, so it may already be in the stack
         if(operation is not None):
+            od = operation.__dict__.copy()
             if(isinstance(operation,(MethodOperation,DMLOperation,ExecutionOperation,CalloutOperation,FlowOperation,TriggerOperation))):
                 if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
                     return None
                 if(len(Operation.OPSTACK) == 0):
-                    Operation.OPSTACK.append(operation.__dict__)
+                    Operation.OPSTACK.append(od)
                     return operation
-                for op in Operation.OPSTACK:
-                    if(op.get('eventId') == operation.eventId):
+                for opDict in Operation.OPSTACK:
+                    if(opDict.get('eventId') == operation.eventId):
                         for key in operation.__dict__:
-                            op[key] = operation.__dict__.get(key)
+                            opDict[key] = operation.__dict__.get(key)
                         return operation
                     try:
-                        if(isinstance(operation, FlowOperation) == False and op.get('name') == operation.name and op.get('eventType') == operation.eventType and op.get('eventSubType') == operation.eventSubType):
-                            for key in operation.__dict__:
-                                op[key] = operation.__dict__.get(key)
+
+                        if(isinstance(operation, FlowOperation) == False and opDict.get('name') == operation.name and opDict.get('eventType') == operation.eventType and opDict.get('eventSubType') == operation.eventSubType):
+                            #print(f"op.logLine: {opDict.get('lineNumber')} | operation.logLine: {operation.lineNumber} | op.eventId: {opDict.get('eventId')} | operation.eventId: {operation.eventId}")
+                            opDict.update(od)
                             return operation
                     except Exception as e:
                         pp(operation.__dict__)
-                        pp(op)
+                        pp(opDict)
                         raise e
 
-                Operation.OPSTACK.append(operation.__dict__)
+                Operation.OPSTACK.append(od)
         
         return operation
+
+    @staticmethod
+    def getLastOperation(operation)->dict:
+        if(operation is not None):
+
+            if(isinstance(operation, FlowOperation)):
+                pass
+            if(isinstance(operation, MethodOperation)):
+                pass
+            if(isinstance(operation, TriggerOperation)):
+                pass
+            if(isinstance(operation, CalloutOperation)):
+                pass
+            if(isinstance(operation, DMLOperation)):
+                pass
+            if(isinstance(operation, ExecutionOperation)):
+                pass
+
+        return None
