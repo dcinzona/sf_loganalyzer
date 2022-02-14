@@ -42,11 +42,15 @@ class OperationFactory():
                     pass
                 else:
                     pass
+            elif(tokens[1] == 'FATAL_ERROR'):
+                #should probably end here
+                pass
                     # operation = MethodOperation(logLine)
 
         #The operation here is based on the log line, so it may already be in the stack
         if(operation is not None):
             od = operation.__dict__.copy()
+            od['tokens'] = tokens
             if(isinstance(operation,(MethodOperation,DMLOperation,ExecutionOperation,CalloutOperation,FlowOperation,TriggerOperation))):
                 if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
                     return None
@@ -59,7 +63,6 @@ class OperationFactory():
                             opDict[key] = operation.__dict__.get(key)
                         return operation
                     try:
-
                         if(isinstance(operation, FlowOperation) == False and opDict.get('name') == operation.name and opDict.get('eventType') == operation.eventType and opDict.get('eventSubType') == operation.eventSubType):
                             #print(f"op.logLine: {opDict.get('lineNumber')} | operation.logLine: {operation.lineNumber} | op.eventId: {opDict.get('eventId')} | operation.eventId: {operation.eventId}")
                             opDict.update(od)
@@ -69,7 +72,7 @@ class OperationFactory():
                         pp(opDict)
                         raise e
 
-                Operation.OPSTACK.append(od)
+                operation.appendTo(Operation.OPSTACK)
         
         return operation
 

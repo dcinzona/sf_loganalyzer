@@ -56,20 +56,14 @@ class Operation(dynamicDict):
     def updateData(self, opDict:dict):        
         self.update(opDict)
 
-
     def isEntry(self):
         return self.operationAction in EntryPoints.ENTRY_POINTS
         
     def isExit(self):
         return self.operationAction in ExitPoints.EXIT_POINTS
 
-    @classmethod
-    def getLastOperation(cls)->dict:
-        return cls.LAST_OPERATION
-
-    @classmethod
-    def setLastOperation(cls, opDict:dict)->dict:
-        cls.LAST_OPERATION = opDict
+    def appendTo(cls, opStack:list):
+        opStack.append(cls.__dict__.copy())
 
     @staticmethod
     def print(cls, msg=None):

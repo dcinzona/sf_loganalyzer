@@ -1,5 +1,6 @@
 from pprint import pp
 import sys, os, re, traceback
+from Operations.Invocations.FatalError import FatalErrorOp
 from Operations.LogData import LogData
 from Operations.LogLine import LogLine
 from Operations.Operation import Operation
@@ -29,6 +30,10 @@ class reader:
                 if(isValid):
                     self.logReversed.insert(0, line)
                     ll = LogLine(line, self.lineCount)
+                    if(ll.lineSplit[1] == 'FATAL_ERROR'):
+                        FatalErrorOp(ll).appendTo(Operation.OPSTACK)
+                        #Operation.OPSTACK.append(FatalErrorOp(ll).__dict__.copy())
+                        #break
                     # ll.stackOperation = LogData().getStack().peek() if LogData().getStack().is_empty() == False else None
                     op = OperationFactory.createOperation(ll)
         

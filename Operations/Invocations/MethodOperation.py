@@ -10,8 +10,6 @@ class MethodOperation(Operation):
     METHODSTACK:list = []
     LAST_OPERATION:dict = None
 
-    _eventId:str = None
-
     def __init__(self, ll):
         tokens = ll.lineSplit
         self.eventType = 'APEX'
