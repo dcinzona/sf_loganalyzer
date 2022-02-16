@@ -5,6 +5,7 @@ Requires Python 3.6 or higher
 import os,sys,re,traceback
 
 from logfileReader import reader
+from vizutils.renderer import renderer
 
 
 class logviz:
@@ -12,6 +13,9 @@ class logviz:
     def run(self):
         self.reader = reader(sys.argv[1])
         self.reader.read()
+        self.renderer = renderer()
+        self.renderer.processStack(self.reader.operations)
+        print(f'\n{len(self.reader.operations)} reader operations found')
 
 
 if __name__ == "__main__":
@@ -24,5 +28,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n== Error ==\n{e}\n")
         traceback.print_exc()
-        print(f"\nLast Line: {runner.reader.lineCount}\n {runner.reader.logReversed[1]}\n {runner.reader.logReversed[0]}")
+        print(f"Last Line: {runner.reader.lineCount}")
+        for line in runner.reader.logReversed[-2:]:
+            print(line)
         sys.exit(1)

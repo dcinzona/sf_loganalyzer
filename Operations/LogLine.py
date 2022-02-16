@@ -18,9 +18,6 @@ class LogLine(object):
             #self.eventSubType = self.lineSplit[3]
             self.lineNumber = lineNumber
 
-            
-
-    
     @staticmethod
     def isValidLine(line):
         isValid = timestampPattern.match(line) is not None and line.find('|') != -1

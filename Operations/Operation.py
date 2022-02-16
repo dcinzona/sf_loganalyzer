@@ -14,22 +14,24 @@ class kLimit:
         self.value = val
         self.maxValue = maxVal
 
-class LimitData:
-    startlimits:object = None
-    endlimits:object = None
-    def __init__(self):
-        self.startlimits = {}
-        self.endlimits = {}
-
+class LimitData(dict):
+    def __init__(self, initializer:dict = None):
+        if(initializer is not None):
+            super().__init__(initializer)
+        else:
+            self['startlimits'] = {}
+            self['endlimits'] = {}
+        
     def addLimit(self, start:bool, key:str, val:dict):
         if(start):
-            self.startlimits[key] = val
+            self['startlimits'].setdefault(key, val)
+            #self['startlimits'][key] = val
         else:
-            self.endlimits[key] = val
+            self['endlimits'].setdefault(key, val)
+            #self['endlimits'][key] = val
 
 
 class Operation(dynamicDict):
-    OPSTACK:list = []
     name:str = ''
     lines:list[str] = []
     lineNumber:int = 0
@@ -39,34 +41,43 @@ class Operation(dynamicDict):
     eventSubType:str = None
     operationAction:str = ''
     #tokensLength:int = 0
-    limits:LimitData = LimitData()
     operations:list = []
     LAST_OPERATION:dict = None
 
+    def __init__(self, *args, **kwargs):
+        super(dynamicDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
     def __init__(self, ll):
-        #self.name = None #tokens[-1]
-        tokens = ll.lineSplit
-        self.operationAction = tokens[1]
-        self.lineNumber = ll.lineNumber
-        linestr = ll.line
-        self.lines.append(linestr)
-        self.timeStamp = tokens[0] if self.timeStamp is None else self.timeStamp
+        # This is a horrible hack
+        if(str(ll.__class__) == "<class 'Operations.LogLine.LogLine'>"):            
+            tokens = ll.lineSplit
+            self.operationAction = tokens[1]
+            self.lineNumber = ll.lineNumber
+            linestr = ll.line
+            self.lines.append(linestr)
+            self.timeStamp = tokens[0] if self.timeStamp is None else self.timeStamp
+            if(self.operationAction in [EntryPoints.CODE_UNIT_STARTED]):
+                self.clusterNode = True
+            elif(self.get('clusterNode', False) != True):
+                self.clusterNode = False
+            super(Operation, self).__init__(self.__dict__)
+        if(isinstance(ll,dict)):
+            super(Operation, self).__init__(ll)
        
 
-    def updateData(self, opDict:dict):        
-        self.update(opDict)
-
     def isEntry(self):
-        return self.operationAction in EntryPoints.ENTRY_POINTS
+        return self.operationAction in [EntryPoints.CODE_UNIT_STARTED, ExitPoints.FLOW_CREATE_INTERVIEW_END, EntryPoints.METHOD_ENTRY]
         
     def isExit(self):
         return self.operationAction in ExitPoints.EXIT_POINTS
 
-    def appendTo(cls, opStack:list):
-        opStack.append(cls.__dict__.copy())
+    def appendTo(self, opStack:list):
+        opStack.append(self)
 
     @staticmethod
     def print(cls, msg=None):
+        return
         #print(json.dumps(self, default=lambda x: x.__dict__, indent=4, sort_keys=True))
         try:
             ln = f'[{cls.lineNumber}] {cls.eventType}|{cls.name}' if msg is None else f'[{cls.lineNumber}] {msg}'

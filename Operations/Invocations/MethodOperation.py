@@ -1,4 +1,6 @@
 from pprint import pp
+from Operations.EntryOrExit import EntryOrExit, EntryPoints, ExitPoints
+from Operations.OpUtils import dynamicDict
 from Operations.Operation import Operation
 import re
 
@@ -8,52 +10,62 @@ constructorPattern = re.compile(r'(\w+)\.\1\(\)$')
 class MethodOperation(Operation):
 
     METHODSTACK:list = []
-    LAST_OPERATION:dict = None
 
     def __init__(self, ll):
+        super(MethodOperation, self).__init__(ll) 
         tokens = ll.lineSplit
         self.eventType = 'APEX'
         self.eventId = f'{tokens[-3]}|{tokens[-2]}|{tokens[-1]}' #[id]MethodName
         self.eventSubType = 'METHOD'
-        self.isContructor(tokens)
-        MethodOperation.LAST_OPERATION = None
+        self.isContructor(tokens)         
+        self.name = tokens[-1]
         if(tokens[1] in ['METHOD_ENTRY','CODE_UNIT_STARTED']):
             # 15:09:44.547 (12548827536)|METHOD_ENTRY|[17]|01pr000000120Tt|SF86RecordSyncHelper.syncMilitaryToSect15(List<Military_Service__c>)
-            self.name = tokens[-1]
             self.lineNumber = ll.lineNumber
-            MethodOperation.METHODSTACK.append(self.__dict__.copy())
+            self.appendToStack()
+            # if(tokens[1] == 'CODE_UNIT_STARTED'):
+            #     self.cluster = { 'name':self.name, 'start':self.lineNumber }
         
         if(tokens[1] in ['METHOD_EXIT','CODE_UNIT_FINISHED']):
-            d = None
-            # 15:09:44.547 (12548827536)|METHOD_EXIT|[17]|01pr000000120Tt|SF86RecordSyncHelper.syncMilitaryToSect15(List<Military_Service__c>)
-            if(len(MethodOperation.METHODSTACK) == 1 and tokens[1] == 'METHOD_EXIT'):
-                d = MethodOperation.METHODSTACK.pop() 
-            elif(len(MethodOperation.METHODSTACK) > 1):
-                d = self.findSelfinStack(True)
-            else:
-                raise Exception('MethodOperation.METHODSTACK is empty')
-            
+            d = self.findSelfinStack()            
             if(d is not None):
-                MethodOperation.LAST_OPERATION = d
-                for key in d:
-                    if(key != 'lineNumber'):
-                        object.__setattr__(self, key, d.get(key))
+                self.update(d)
+                self.finshed = True
+                # if(tokens[1] == 'CODE_UNIT_FINISHED'):
+                #     self.cluster['end'] = ll.lineNumber if self.get('cluster', None) is not None else None
             else:
                 pp(MethodOperation.METHODSTACK)
                 print('^ METHODSTACK ^')
                 pp(self.__dict__)
                 raise Exception('Could not find matching MethodOperation in MethodOperation.METHODSTACK')
-        
-        #super(MethodOperation, self).__init__(ll) 
     
-    def findSelfinStack(self, pop:bool):
-        for idx,x in enumerate(MethodOperation.METHODSTACK):
-            if(x.get('eventId') == self.eventId):
-                if(pop):
-                    return MethodOperation.METHODSTACK.pop(idx)
-                else:
-                    return x
+    def appendToStack(self):
+        MethodOperation.METHODSTACK.append(self)
+
+
+    def findSelfinStack(self):
+        if(len(MethodOperation.METHODSTACK) == 0):
+            raise Exception('MethodOperation.METHODSTACK is empty')
+        # 15:09:44.547 (12548827536)|METHOD_EXIT|[17]|01pr000000120Tt|SF86RecordSyncHelper.syncMilitaryToSect15(List<Military_Service__c>)
+        if(len(MethodOperation.METHODSTACK) == 1 and self.operationAction == 'METHOD_EXIT'):
+            return MethodOperation.METHODSTACK.pop() 
+        elif(len(MethodOperation.METHODSTACK) >= 1):
+            for x in MethodOperation.METHODSTACK[::-1]:
+                if(self.isMatch(x)):
+                    return MethodOperation.METHODSTACK.pop(MethodOperation.METHODSTACK.index(x))
+
+        pp(MethodOperation.METHODSTACK)
+        pp(self.__dict__)
+        exit()
         return None
+
+    def isMatch(self, stackOp:Operation):
+        if(self.operationAction == ExitPoints.METHOD_EXIT and stackOp.operationAction == EntryPoints.METHOD_ENTRY):
+            return self.eventId == stackOp.eventId
+        elif(self.operationAction == ExitPoints.CODE_UNIT_FINISHED and stackOp.operationAction == EntryPoints.CODE_UNIT_STARTED):
+            return self.name == stackOp.name
+        return False
+
 
     def isContructor(self, tokens:list):
         name = tokens[-1].strip()
