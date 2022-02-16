@@ -58,3 +58,10 @@ datasets/mapping.yml
 Swagger/Generator/GeneratedApex/
 GeneratedApex.zip
 test.json
+
+*.gv
+*.dot
+*.svg
+*.png
+*.jpg
+*.pdf
