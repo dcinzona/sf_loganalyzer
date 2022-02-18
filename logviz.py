@@ -11,16 +11,23 @@ from vizutils.renderer import renderer
 class logviz:
     reader=None
     def run(self):
-        self.reader = reader(sys.argv[1])
+        if(len(sys.argv) < 2):
+            print('Usage: python3 logviz.py [logfile] [optional format:pdf,png,svg]')
+            exit()
+        logfile = sys.argv[1]
+        fileFormat = None
+        if(len(sys.argv) > 2):
+            fileFormat = sys.argv[2]
+        self.reader = reader(logfile)
         self.reader.read()
-        self.renderer = renderer()
+        self.renderer = renderer(filename=logfile, fileformat=fileFormat)
         self.renderer.processStack(self.reader.operations)
         print(f'\n{len(self.reader.operations)} reader operations found')
 
 
 if __name__ == "__main__":
     if(len(sys.argv) != 2 and len(sys.argv) != 3):
-        print("Usage: logviz.py <logfile> [optional:outputfile]")
+        print('Usage: python3 logviz.py [logfile] [optional format:pdf,png,svg]')
         sys.exit()
     runner = logviz()
     try:

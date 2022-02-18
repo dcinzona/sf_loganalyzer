@@ -1,6 +1,6 @@
 from pprint import pp
-from typing import Any
 import re
+import base64
 
 
 class dynamicDict(dict):
@@ -57,9 +57,8 @@ class dynamicDict(dict):
             print(cp.__str__())
             exit()
             #raise Exception('eventType is None')
-        if(self.name.startswith('apex://')):
-            self.name = self.name.replace('apex://', '')
-        return f'{self.eventType}|{re.escape(self.name.split(":")[0])}'
+        name = f'{self.eventType}|{self.name}'
+        return base64.b64encode(name.encode('utf-8')).decode('utf-8')
     # def __call__(self, *args: Any, **kwds: Any) -> Any:
     #     print('called')
     #     pp(self)

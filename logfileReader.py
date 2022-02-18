@@ -13,12 +13,12 @@ class reader:
     lineCount:int=0
     logReversed:list=[]
 
-    def __init__(self, logfile):
-        self.logfile = logfile
+    def __init__(self, file:str):
+        self.logfile = file
         self.logReversed = []
         self.lineCount = 0
         self.operations = []
-        self.logpath = os.path.abspath(logfile)
+        self.logpath = os.path.abspath(file)
         self.filename = os.path.basename(self.logpath)
         self.inputfileDir = os.path.dirname(os.path.abspath(self.logpath))
         self.factory = OperationFactory()

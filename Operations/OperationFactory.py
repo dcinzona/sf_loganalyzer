@@ -26,6 +26,7 @@ class OperationFactory():
                 if(len(tokens[-2]) > 0):
                     # Second to last token is the method line number
                     operation = MethodOperation(logLine)
+                    pass
             elif(tokens[1].startswith("DML_")):
                 pass
                 # operation = DMLOperation(logLine);
@@ -58,14 +59,14 @@ class OperationFactory():
                     lastOp = self.getOpenParentOperation(operation)
                     if(lastOp is not None):
                         operation.parent = lastOp if operation.get('parent', None) is None else operation.parent
-                    self.appendToStack(operation)
+                    #self.appendToStack(operation)
                 return operation
                     # operation = MethodOperation(logLine)
 
         #The operation here is based on the log line, so it may already be in the stack
         if(operation is not None):
             if(operation.get('parent', None) == None and operation.isEntry()):
-                operation.parent = self.getOpenParentOperation(operation) #self.OPERATIONS[-1] if len(self.OPERATIONS) > 0 else None
+                operation.parent = self.getOpenParentOperation(operation)
             operation.tokens = tokens
             if(isinstance(operation,(MethodOperation,DMLOperation,ExecutionOperation,CalloutOperation,FlowOperation,TriggerOperation))):
                 if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
