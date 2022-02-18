@@ -1,27 +1,32 @@
 from pprint import pp
 
 from matplotlib.pyplot import margins, xlabel
+from Operations.OpUtils import dynamicDict
 from Operations.Operation import Operation
 import graphviz
 
 class renderer():
 
-    def __init__(self, filename:str='', fileformat:str='svg', useloops:bool=True) -> None:
-        self.g = graphviz.Digraph(f'{filename}', comment=f'Log file visualization for {filename}',format=fileformat)
-        self.useloops = useloops
+    def __init__(self, *args, **kwargs) -> None:
+        fileformat = kwargs.get('format', 'svg')
+        self.filename = kwargs.get('logfile', None)
+        self.g = graphviz.Digraph(f'{self.filename}', comment=f'Log file visualization for {self.filename}',format=fileformat)
+        self.useloops = kwargs.get('useloops', False)
+        self.options = dynamicDict(kwargs)
         self.stackProcessMap = {}
+        print(f'kwargs: {self.options}')
 
     def processStack(self, sortedOperations:list):
         self.operations = sortedOperations
-        self.g.strict = True
-        self.g.graph_attr['rankdir'] = 'LR'
+        self.g.strict = self.options.strict
+        self.g.engine = self.options.engine
+        self.g.graph_attr['rankdir'] = self.options.rankdir
         self.g.attr('node',fontname='helveticaneue-light')
         self.g.attr('edge',fontname='helveticaneue-light')
         if(len(self.operations) == 0):
             raise Exception("No operations found in the log file")
         self._checkIdx()
         self._buildGraph(self.operations)
-        self.g.view()
         # for op in self.operations:
         #     if(op.children is not None):
         #         for child in op.children:
