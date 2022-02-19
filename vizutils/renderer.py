@@ -64,7 +64,7 @@ class renderer():
                     if(isinstance(op, FatalErrorOp)):              
                         nodeTT += f'\n   {op.name}' if op.name.startswith('System.LimitException:') else f'\n   {opName}'
                     else:
-                        opName = f'{op.eventType}'
+                        opName = f'{op.eventType}\nuid{op.nodeId}'
                         nodeTT += f'\n   {op.nodeId}'
                         parentOpName = parentNodeId
                 else:
@@ -164,9 +164,9 @@ class renderer():
                 idx = uniques.index(op.nodeId) if op.nodeId in uniques else -1
                 if(idx == -1):
                     uniques.append(f'{op.nodeId}')
-                    op._nodeId = f'uid_{len(uniques)-1}'
+                    op._nodeId = f'({len(uniques)-1})'
                     continue
-                op._nodeId = f'uid_{idx}'
+                op._nodeId = f'({idx})'
 
 
     
