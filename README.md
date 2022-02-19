@@ -21,6 +21,5 @@ Options:
 
 
 _TODO_
-Not happy with how this is rendering out in the chart (not what I'm looking for). It's hard to follow.
-
-1. See if this needs to be handled in order of execution on entry, rather than stack (so sort by line number and have the parent be the immediately preceding operation)
+1. Support other event types (DML, SOQL, Callouts, etc)
+2. Count SOQL Queries and limits effectively _per node collected_
