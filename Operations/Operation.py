@@ -1,8 +1,5 @@
 
-from abc import ABC
-import json
 from pprint import pp
-
 import traceback
 from Operations.EntryOrExit import EntryOrExit, EntryPoints, ExitPoints
 from Operations.OpUtils import dynamicDict
@@ -43,6 +40,7 @@ class Operation(dynamicDict):
     #tokensLength:int = 0
     operations:list = []
     LAST_OPERATION:dict = None
+    finished:bool = False
 
     def __init__(self, *args, **kwargs):
         super(dynamicDict, self).__init__(*args, **kwargs)
@@ -67,6 +65,8 @@ class Operation(dynamicDict):
        
 
     def isEntry(self):
+        if(self.get('eventId','').startswith('ERROR|')):
+            return True
         return self.operationAction in [EntryPoints.CODE_UNIT_STARTED, ExitPoints.FLOW_CREATE_INTERVIEW_END, EntryPoints.METHOD_ENTRY]
         
     def isExit(self):
@@ -88,27 +88,59 @@ class Operation(dynamicDict):
             print(cls.__class__)
             exit(e)
 
-
     @staticmethod
-    def findSelfinStack(op, stack:list[dict], eventIdOnly=False) -> dict:
-        if(len(stack) > 0):
-            for i in range(len(stack)-1, -1, -1):
-                sop = stack[i]
-                if(sop.get('eventId') == op.eventId):
-                    return stack.pop(i)
-                if(eventIdOnly == False):
-                    try:
-                        if(sop.get('name') == op.name and sop.get('eventType') == op.eventType, sop.get('eventSubType') == op.eventSubType):
-                            return stack.pop(i)
-                        # if(sop.eventType == op.eventType and sop.eventSubType == op.eventSubType):
-                        #     return sop,i
-                    except Exception:
-                        print(traceback.format_exc())
-                        print(op)
-                        pp(stack[i])
-                        exit()
-        print(f'{op.name} not found in stack :(')
-        pp(stack)
-        pp(op)
-        return None
+    def getType(tokens:list[str]=None):
+        if(tokens is None):
+            return None
+        evnt:str = tokens[1]
+        last:str = tokens[-1].split('.')[0]
+        if(evnt.startswith('METHOD_')):
+            return 'apex'
+        elif(evnt.startswith('FLOW_')):
+            return 'flows'
+        elif(evnt.startswith('SOQL_')):
+            return 'soql'
+        elif(evnt.startswith('CALLOUT_')):
+            return 'callout'
+        elif(evnt.startswith('DML_')):
+            return 'dml'
+        elif(evnt.startswith('CODE_UNIT_')):
+            if(last.startswith("__sfdc_trigger")):
+                return 'triggers'
+            elif(last.startswith('Workflow:')):
+                return 'workflows'
+            elif(last.startswith('Flow:')):
+                return 'flows'
+            elif(last.startswith("Validation:")):
+                return 'validations'
+            elif(last.startswith("DuplicateDetector")):
+                return 'duplicateDetector'
+            elif(last.lower() not in ['system','database','userInfo']):
+                return 'apex'
+        elif(evnt in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
+            return 'exceptions'
+        return 'Unknown'
+
+    # @staticmethod
+    # def findSelfinStack(op, stack:list[dict], eventIdOnly=False) -> dict:
+    #     if(len(stack) > 0):
+    #         for i in range(len(stack)-1, -1, -1):
+    #             sop = stack[i]
+    #             if(sop.get('eventId') == op.eventId):
+    #                 return stack.pop(i)
+    #             if(eventIdOnly == False):
+    #                 try:
+    #                     if(sop.get('name') == op.name and sop.get('eventType') == op.eventType, sop.get('eventSubType') == op.eventSubType):
+    #                         return stack.pop(i)
+    #                     # if(sop.eventType == op.eventType and sop.eventSubType == op.eventSubType):
+    #                     #     return sop,i
+    #                 except Exception:
+    #                     print(traceback.format_exc())
+    #                     print(op)
+    #                     pp(stack[i])
+    #                     exit()
+    #     print(f'{op.name} not found in stack :(')
+    #     pp(stack)
+    #     pp(op)
+    #     return None
 

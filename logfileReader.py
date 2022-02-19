@@ -11,17 +11,22 @@ from Operations.OperationFactory import OperationFactory
 class reader:
 
     lineCount:int=0
-    logReversed:list=[]
+    loglines:list[str]=[]
 
-    def __init__(self, file:str):
-        self.logfile = file
-        self.logReversed = []
+    @property
+    def logReversed(self):
+        return list(reversed(self.loglines))
+
+    def __init__(self, **kwargs):
+        self.options = dynamicDict(kwargs)
+        self.logfile = self.options.logfile
+        self.loglines = []
         self.lineCount = 0
         self.operations = []
-        self.logpath = os.path.abspath(file)
+        self.logpath = os.path.abspath(self.logfile)
         self.filename = os.path.basename(self.logpath)
         self.inputfileDir = os.path.dirname(os.path.abspath(self.logpath))
-        self.factory = OperationFactory()
+        self.factory = OperationFactory(operationTypes=self.options.types)
 
     def read(self):
         with open(self.logpath) as infile:
@@ -30,28 +35,20 @@ class reader:
                 self.lineCount += 1
                 isValid, line = LogLine.isValidLine(line.strip())
                 if(isValid):
-                    self.logReversed.insert(0, line)
-                    ll = LogLine(line, self.lineCount)
-                    op = self.factory.createOperation(ll)
-        
+                    self.loglines.append(line)
+                    #self.factory.createOperation(LogLine(line, self.lineCount))
+                    self.factory.createOrderedOperation(LogLine(line, self.lineCount))
         self.operations = self.factory.OPERATIONS
 
-    # def _defineStackProcessMap(self):
-    #     self.operations = self._sortStack()
-    #     if(len(self.operations) == 0):
-    #         raise Exception("No operations found in the log file")
-    #     for idx, op in enumerate(self.operations):
-    #         op['idx'] = idx
-
-    #     self.stackProcessMap = {}
-    #     for op in self.operations:
-    #         uid = op["eventType"] + "|" + op["name"]
-    #         if(uid in self.stackProcessMap):
-    #             self.stackProcessMap[uid].append(op)
-    #         else:
-    #             self.stackProcessMap[uid] = [op]
-    #     return self.stackProcessMap
-        
+        if(self.options.get('debug', False)):
+            openOps = 0
+            for idx,op in enumerate(self.operations):
+                if(op.finished == False):
+                    openOps += 1
+                    print(f'{idx} [{op.lineNumber}] "{op.name}" <{op.eventId}> is not finished')
+            if(openOps > 0):
+                print(f'{openOps} operations are not finished')
+                #exit(1)
 
     def _sortStack(self):
         self.operations = self.factory.OPERATIONS # sorted(Operation.OPSTACK, key=lambda x: x["lineNumber"])

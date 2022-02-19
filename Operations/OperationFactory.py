@@ -9,99 +9,159 @@ from Operations.Invocations.ExecutionOperation import ExecutionOperation
 from Operations.Invocations.FlowOperation import FlowOperation
 from Operations.Invocations.MethodOperation import MethodOperation
 from Operations.Invocations.TriggerOperation import TriggerOperation
-from Operations.OperationStack import OperationStack
 
 class OperationFactory():
     OPERATIONS:list[Operation] = []
+    hitException:bool = False
 
     def __init__(self, *args, **kwargs):
         self.OPERATIONS = []
-        pass
+        self.hitException = False
+        self.valid_ops = kwargs.get('operationTypes',[])
+        self.stop_on_exception = kwargs.get('stop-on-exception', False)
+
+    def _shouldProcess(self, optype:str):
+        return optype in self.valid_ops or 'all' in self.valid_ops
 
     def createOperation(self, logLine):
         tokens:list[str]  = logLine.line.split("|");
         operation = None
+        if(self.hitException == True and self.stop_on_exception):
+            return None
         if(tokens and len(tokens)>1):
-            if(tokens[1].startswith("METHOD_")):
+            opType = Operation.getType(tokens)
+            if(tokens[1].startswith("METHOD_") and self._shouldProcess(opType)):
                 if(len(tokens[-2]) > 0):
                     # Second to last token is the method line number
                     operation = MethodOperation(logLine)
                     pass
-            elif(tokens[1].startswith("DML_")):
+            elif(tokens[1].startswith("DML_") and self._shouldProcess(opType)):
                 pass
                 # operation = DMLOperation(logLine);
-            elif(tokens[1].startswith("EXECUTION_")):
+            elif(tokens[1].startswith("EXECUTION_") and self._shouldProcess(opType)):
                 pass
                 # operation = ExecutionOperation(tokens, logLine.lineNumber);
-            elif(tokens[1].startswith("CALLOUT")):
+            elif(tokens[1].startswith("CALLOUT") and self._shouldProcess(opType)):
                 operation = CalloutOperation(logLine);
-            elif(tokens[1].startswith("FLOW_")):
+            elif(tokens[1].startswith("FLOW_") and self._shouldProcess(opType)):
                 if(tokens[1] in EntryOrExit.ALL):
                     operation = FlowOperation(logLine);
-            elif(tokens[1].startswith("CODE_UNIT_")):
+            elif(tokens[1].startswith("CODE_UNIT_") and self._shouldProcess(opType)):
                 #Check if this is a trigger
                 last:str = tokens[-1]
-                if(last.startswith("__sfdc_trigger")):
-                    #this is a trigger code execution
+                if(opType == 'triggers'):
                     operation = TriggerOperation(logLine)
-                elif(last.startswith(('Workflow:', 'Flow:'))):
+                elif(opType == 'flows'):
+                    operation = FlowOperation(logLine)
+                elif(opType == 'workflows'):
                     pass
-                elif(last.startswith("Validation:")):
+                elif(opType == 'validations'):
                     pass
-                elif(last.startswith("DuplicateDetector")):
+                elif(opType == 'duplicateDetector'):
                     pass
-                else:
+                elif(opType == 'apex'):
                     operation = MethodOperation(logLine)
                     pass
             elif(tokens[1] in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
+                self.hitException = True
                 operation = FatalErrorOp(logLine)
                 if(self.findInStack(operation) is None):
                     lastOp = self.getOpenParentOperation(operation)
                     if(lastOp is not None):
                         operation.parent = lastOp if operation.get('parent', None) is None else operation.parent
-                    #self.appendToStack(operation)
                 return operation
-                    # operation = MethodOperation(logLine)
 
         #The operation here is based on the log line, so it may already be in the stack
         if(operation is not None):
             if(operation.get('parent', None) == None and operation.isEntry()):
                 operation.parent = self.getOpenParentOperation(operation)
             operation.tokens = tokens
-            if(isinstance(operation,(MethodOperation,DMLOperation,ExecutionOperation,CalloutOperation,FlowOperation,TriggerOperation))):
-                if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
-                    operation = None
-                    return None
-                op = self.findInStack(operation)
-                if(op is not None):
-                    op.update(operation.__dict__)
-                
-                return operation
-                # for topOfStack in Operation.OPSTACK:
-                #     sti = Operation.OPSTACK.index(topOfStack)
-                #     if(topOfStack.get('eventId') == operation.eventId):
-                #         for key in od:
-                #             topOfStack[key] = od.get(key)
-                #         return operation
-                #     try:
-                #         if(isinstance(operation, FlowOperation) == False and topOfStack.get('name') == operation.name and topOfStack.get('eventType') == operation.eventType and topOfStack.get('eventSubType') == operation.eventSubType):
-                #             #print(f"op.logLine: {opDict.get('lineNumber')} | operation.logLine: {operation.lineNumber} | op.eventId: {opDict.get('eventId')} | operation.eventId: {operation.eventId}")
-                #             topOfStack.update(od)
-                #             return operation
-                #     except Exception as e:
-                #         pp(operation.__dict__)
-                #         pp(topOfStack)
-                #         raise e
-                #     if(topOfStack.get('finished') is not True):
-                #         operation.parent = topOfStack
-
-                # operation.appendTo(Operation.OPSTACK)
+            if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
+                operation = None
+                return None
+            op = self.findInStack(operation)
+            if(op is not None):
+                op.update(operation.__dict__)
         return operation
+
+    def createOrderedOperation(self, logLine):
+        # only push operations onto the stack on operation entry
+        # flows need to be handled differently (flow name isn't on the same line as the entry event)
+        tokens:list[str]  = logLine.line.split("|");
+        op:Operation = None
+        if(self.hitException == True and self.stop_on_exception):
+            return None
+        if(tokens and len(tokens)>1):
+            opType = Operation.getType(tokens)
+            if(self._shouldProcess(opType) == False):
+                return None
+            if(tokens[1].startswith("METHOD_ENTRY")):
+                if(len(tokens[-2]) > 0):
+                    isCustomMethod = tokens[-1].split('.')[0] not in ['System','Database','UserInfo']
+                    if(isCustomMethod):
+                        op = MethodOperation(logLine)
+                        op = MethodOperation.METHODSTACK.pop()
+                        op.finished = True
+            elif(tokens[1].startswith("DML_")):
+                pass
+                #op = DMLOperation(logLine)
+            elif(tokens[1].startswith("EXECUTION_")):
+                pass
+                #op = ExecutionOperation(logLine)
+            elif(tokens[1].startswith("CALLOUT")):
+                pass
+                #op = CalloutOperation(logLine)
+            elif(tokens[1].startswith("FLOW_")):
+                if(tokens[1] in ['FLOW_CREATE_INTERVIEW_BEGIN', 'FLOW_CREATE_INTERVIEW_END']):
+                    op = FlowOperation(logLine)
+                    op.finished = False
+                    if(op.operationAction == 'FLOW_CREATE_INTERVIEW_END'):
+                        op = FlowOperation.FLOWSTACK.pop()
+                        op.finished = True
+            elif(tokens[1].startswith("CODE_UNIT_STARTED")):
+                #Check if this is a trigger
+                last:str = tokens[-1]
+                if(opType == 'triggers'):
+                    op = TriggerOperation(logLine)
+                    op = TriggerOperation.TRIGGERSTACK.pop()
+                    op.finished = True
+                elif(opType == 'flows'):
+                    op = FlowOperation(logLine)
+                    op.finished = False
+                elif(opType == 'workflows'):
+                    pass
+                elif(opType == 'validations'):
+                    pass
+                elif(opType == 'duplicateDetector'):
+                    pass
+                elif(opType == 'apex'):
+                    op = MethodOperation(logLine)
+                    op = MethodOperation.METHODSTACK.pop()
+                    op.finished = True
+                    pass
+            elif(tokens[1] in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
+                self.hitException = True
+                op = FatalErrorOp(logLine)
+                op.finished = True
+            
+            prev = self.OPERATIONS[-1] if len(self.OPERATIONS) > 0 else None
+            if(op is not None and op.finished):
+                if(op.get('parent', None) == None and prev is not None):
+                    if(prev.eventId == op.eventId):
+                        return None
+                    op.parent = prev
+                else:
+                    op.parent = None
+                self.appendToStack(op)
+                return op
+            
+
+
 
     def getOpenParentOperation(self, opIn:Operation):
         if(len(self.OPERATIONS) == 0):
             return None
-        for op in reversed(self.OPERATIONS):
+        for op in self.OPERATIONS[::-1]:
             if(op.get('finished', False) == False and op.eventId != opIn.eventId):
                 return op
         return None
@@ -114,12 +174,12 @@ class OperationFactory():
         # loop through the stack backwards
         for stackOp in self.OPERATIONS[::-1]:
             if(stackOp.eventId == op.eventId):
-                #stackOp.update(op.__dict__)
+                stackOp.update(op.__dict__)
                 return op
             elif(isinstance(op, FlowOperation) == False):
                 try:
                     if(stackOp.name == op.name and stackOp.eventType == op.eventType and stackOp.eventSubType == op.eventSubType):
-                        #stackOp.update(op.__dict__)
+                        stackOp.update(op.__dict__)
                         return op
                 except Exception as e:
                     pp(op)

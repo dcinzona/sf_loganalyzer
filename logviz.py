@@ -17,8 +17,7 @@ class logviz:
         pass
 
     def run(self,*args, **kwargs):
-        print(kwargs)
-        self.reader = reader(kwargs['logfile'])
+        self.reader = reader(**kwargs)
         self.reader.read()
         self.renderer = renderer(*args, **kwargs)
         self.renderer.processStack(self.reader.operations)
@@ -33,10 +32,18 @@ class logviz:
 @click.option('-e','--engine', default='dot', help='Graphviz engine' , show_default=True, type=click.Choice(['dot','neato','twopi','circo','fdp','sfdp','patchwork','osage']))
 @click.option('-f','--format', default='svg', help='Output format [svg, pdf, png]' , show_default=True, type=click.Choice(['svg','pdf','png']))
 @click.option('-8','--useloops', default=True, help='Use loops for duplicate nodes.\nNodes are only rendered once' , show_default=True)
-@click.option('-o','--outputfile', help='Output file')
+@click.option('-r','--rankdir', default='TB', help='The direction the nodes "travel": [TB, BT, LR, RL]', show_default=True, type=click.Choice(['TB','BT','LR','RL'],case_sensitive=False))
+@click.option('-t','--types', 
+help='Types of operations to track', 
+default=['apex','triggers','flows','exceptions'], 
+show_default=True, 
+multiple=True, 
+type=click.Choice(['apex','triggers','flows','callouts','dml','soql','exceptions','all'], case_sensitive=False))
 @click.option('--no-show', default=False, is_flag=True, help='Don\'t show the graph in the default system viewer')
-@click.option('--strict', default=True, help='Will only render a single edge regardless of loop-backs' , show_default=True)
-@click.option('-r','--rankdir', default='TB', help='The direction the nodes "travel": [TB, BT, LR, RL]', show_default=True)
+@click.option('--strict', default=False, is_flag=True, help='Will only render a single edge per node regardless of loop-backs' , show_default=True)
+@click.option('-S','--stop-on-exception', default=False, is_flag=True, help='Stops processing additional operations after first exception' , show_default=True)
+@click.option('-R','--redact', default=False, is_flag=True, help='Strips out operation names and uses event types instead', show_default=True)
+@click.option('--debug', default=False, is_flag=True, help='Debug mode')
 def run(*args, **kwargs):
     runner = logviz()
     try:
@@ -45,8 +52,8 @@ def run(*args, **kwargs):
     except Exception as e:
         print(f"\n== Error ==\n{e}\n")
         traceback.print_exc()
-        print(f"Last Line: {runner.reader.lineCount}")
-        for line in runner.reader.logReversed[-2:]:
+        print(f"\nLast Line: {runner.reader.lineCount}")
+        for line in reversed(runner.reader.logReversed[0:2]):
             print(line)
         sys.exit(1)
 

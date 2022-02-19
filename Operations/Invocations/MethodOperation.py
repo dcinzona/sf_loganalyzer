@@ -30,7 +30,7 @@ class MethodOperation(Operation):
             d = self.findSelfinStack()            
             if(d is not None):
                 self.update(d)
-                self.finshed = True
+                self.finished = True
                 # if(tokens[1] == 'CODE_UNIT_FINISHED'):
                 #     self.cluster['end'] = ll.lineNumber if self.get('cluster', None) is not None else None
             else:
@@ -52,7 +52,8 @@ class MethodOperation(Operation):
         elif(len(MethodOperation.METHODSTACK) >= 1):
             for x in MethodOperation.METHODSTACK[::-1]:
                 if(self.isMatch(x)):
-                    return MethodOperation.METHODSTACK.pop(MethodOperation.METHODSTACK.index(x))
+                    op = MethodOperation.METHODSTACK.pop(MethodOperation.METHODSTACK.index(x))
+                    return op
 
         pp(MethodOperation.METHODSTACK)
         pp(self.__dict__)

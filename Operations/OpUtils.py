@@ -7,31 +7,7 @@ class dynamicDict(dict):
     def __init__(self, *args, **kwargs):
         super(dynamicDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
-    
-    # def __init__(self, *args, **kwargs):
-    #     if(args is not None):
-    #         self.update(args[0])
-    #     elif (kwargs is not None):
-    #         self.update(kwargs)
-
-    # def __getattr__(self, item):
-    #     object.__setattr__(self, item, None)
-    #     return None
-
-    # def __setattr__(self,k,v):
-    #     object.__setattr__(self,k,v)
-
-    # @property
-    # def __dict__(self):
-    #     return self._innerDict
-
-    # def update(self, d:dict):
-    #     for k, v in d.items():
-    #         self.__setattr__(k, v)
-
-    # def copy(self):
-    #     return self.__class__(self._innerDict)
-
+        
     @classmethod
     def from_dict(cls, d:dict):
         return cls(d)
@@ -49,16 +25,18 @@ class dynamicDict(dict):
 
     @property
     def nodeId(self):
-        if('eventType' not in self.keys() or self.eventType is  None):
-            cp = self.__dict__.copy()
-            cp.pop('parent')
-            cp.pop('lineSplit')
-            cp.pop('tokens')
-            print(cp.__str__())
-            exit()
-            #raise Exception('eventType is None')
-        name = f'{self.eventType}|{self.name}'
-        return base64.b64encode(name.encode('utf-8')).decode('utf-8')
+        if(self.get('_nodeId',None) is None):
+            if('eventType' not in self.keys() or self.eventType is  None):
+                cp = self.__dict__.copy()
+                cp.pop('parent')
+                cp.pop('lineSplit')
+                cp.pop('tokens')
+                print(cp.__str__())
+                exit()
+                #raise Exception('eventType is None')
+            name = f'{self.eventType}|{self.name}'
+            self._nodeId = base64.b64encode(name.encode('utf-8')).decode('utf-8')
+        return self._nodeId
     # def __call__(self, *args: Any, **kwds: Any) -> Any:
     #     print('called')
     #     pp(self)

@@ -20,7 +20,7 @@ class TriggerOperation(Operation):
             if(t is None):
                 raise Exception('Could not find matching TriggerOperation in TriggerOperation.TRIGGERSTACK')
             self.update(t)
-            self.finshed = True
+            self.finished = True
 
     def findInStack(self):
         if(len(TriggerOperation.TRIGGERSTACK) == 0):

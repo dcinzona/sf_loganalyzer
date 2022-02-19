@@ -9,7 +9,6 @@ from Operations.Operation import LimitData, Operation
 class FlowOperation(Operation):
 
     FLOWSTACK:list = []
-    LAST_OPERATION:dict = None
     FLOW_WITH_LIMITS = None
     CREATE_INTERVIEW_TYPE:str = None
     CURRENT_FLOW = None
@@ -32,14 +31,17 @@ class FlowOperation(Operation):
             self.flowCreateInterviewBegin(tokens)
         elif(tokens[1] == "FLOW_CREATE_INTERVIEW_END"):
             self.flowCreateInterviewEnd(tokens, ll.lineNumber)
-
+        elif(tokens[1] == "CODE_UNIT_FINISHED"):
+            d = FlowOperation.FLOWSTACK.pop()
+            self.update(d)
+            self.finished = True            
         elif(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN",'FLOW_INTERVIEW_FINISHED']):
             d = self.getFlowFromStack(tokens[2])
             if(d is not None):
                 self.update(d)
                 # for key in d.__dict__:
                 #     self.__setattr__(key, d.get(key))
-                if(tokens[1] == 'FLOW_INTERVIEW_FINISHED'):
+                if(tokens[1].endswith('_FINISHED')):
                     self.finished = True
                     #FlowOperation.LAST_OPERATION = FlowOperation.FLOWSTACK[i]#.pop(i)
             else:
@@ -80,7 +82,7 @@ class FlowOperation(Operation):
     def codeUnitStarted(self, tokens:list=None):
         self.name = tokens[-1]
         self.eventType = 'FLOW_WRAPPER'
-        #FlowOperation.FLOWSTACK.append(self)
+        self.appendToStack()
     
     
     def flowCreateInterviewBegin(self, tokens:list=None):
