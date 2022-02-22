@@ -3,6 +3,7 @@ from pprint import pp
 import traceback
 from Operations.EntryOrExit import EntryOrExit, EntryPoints, ExitPoints
 from Operations.OpUtils import dynamicDict
+from Operations.LogLine import LogLine
 
 class kLimit:
     value:int = 0
@@ -30,39 +31,49 @@ class LimitData(dict):
 
 class Operation(dynamicDict):
     name:str = ''
-    lines:list[str] = []
     lineNumber:int = 0
     timeStamp:str = None
     eventType:str = None
     eventId:str = None
     eventSubType:str = None
     operationAction:str = ''
-    #tokensLength:int = 0
     operations:list = []
     LAST_OPERATION:dict = None
     finished:bool = False
+    namespace = None
+    limitsProcessed = 0
 
     def __init__(self, *args, **kwargs):
         super(dynamicDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
 
-    def __init__(self, ll):
-        # This is a horrible hack
-        if(str(ll.__class__) == "<class 'Operations.LogLine.LogLine'>"):            
-            tokens = ll.lineSplit
-            self.operationAction = tokens[1]
-            self.lineNumber = ll.lineNumber
-            linestr = ll.line
-            self.lines.append(linestr)
-            self.timeStamp = tokens[0] if self.timeStamp is None else self.timeStamp
-            if(self.operationAction in [EntryPoints.CODE_UNIT_STARTED]):
-                self.clusterNode = True
-            elif(self.get('clusterNode', False) != True):
-                self.clusterNode = False
-            super(Operation, self).__init__(self.__dict__)
-        if(isinstance(ll,dict)):
-            super(Operation, self).__init__(ll)
-       
+    def __init__(self, ll:dict):
+        super(Operation, self).__init__(ll)
+
+    def __init__(self, ll:LogLine):      
+        tokens = ll.lineSplit
+        self.operationAction = tokens[1]
+        self.lineNumber = ll.lineNumber
+        self.ll = ll
+        self.timeStamp = tokens[0] if self.timeStamp is None else self.timeStamp
+        if(self.operationAction in [EntryPoints.CODE_UNIT_STARTED]):
+            self.clusterNode = True
+        elif(self.get('clusterNode', False) != True):
+            self.clusterNode = False
+        super(Operation, self).__init__(self.__dict__)
+    
+    # should be implemented by subclasses
+    def processLimits(self, logline:LogLine):
+        if(logline.additionalLines is not None and len(logline.additionalLines) > 0):
+            namespace = logline.lineSplit[-2] if logline.lineSplit[-2] != '(default)' else None
+            if(namespace == self.namespace):
+                Operation.limitsProcessed += 1
+                self.limitsProcessed = Operation.limitsProcessed
+                #print(f'{self.__class__.__name__}: {self.name.split(" ")[0]}[{self.lineNumber}] LIMIT USAGE:')
+                #no namespace - check if the current operation has a namespace
+                self.limitsUsageData = self.setdefault('limitsUsageData', [])
+                self.limitsUsageData = logline.additionalLines
+                print(f'{self.name}: {Operation.limitsProcessed}')
 
     def isEntry(self):
         if(self.get('eventId','').startswith('ERROR|')):
@@ -97,7 +108,7 @@ class Operation(dynamicDict):
         if(evnt.startswith('METHOD_')):
             return 'apex'
         elif(evnt.startswith('FLOW_')):
-            return 'flows'
+            return 'flow'
         elif(evnt.startswith('SOQL_')):
             return 'soql'
         elif(evnt.startswith('CALLOUT_')):
@@ -106,19 +117,20 @@ class Operation(dynamicDict):
             return 'dml'
         elif(evnt.startswith('CODE_UNIT_')):
             if(last.startswith("__sfdc_trigger")):
-                return 'triggers'
+                return 'trigger'
             elif(last.startswith('Workflow:')):
-                return 'workflows'
+                return 'workflow'
             elif(last.startswith('Flow:')):
-                return 'flows'
+                return 'flow'
             elif(last.startswith("Validation:")):
-                return 'validations'
+                return 'validation'
             elif(last.startswith("DuplicateDetector")):
                 return 'duplicateDetector'
             elif(last.lower() not in ['system','database','userInfo']):
                 return 'apex'
         elif(evnt in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
-            return 'exceptions'
+            #return 'exceptions'
+            return '' #always display errors / exceptions
         return 'Unknown'
 
     # @staticmethod

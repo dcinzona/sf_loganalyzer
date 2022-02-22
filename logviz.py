@@ -33,12 +33,11 @@ class logviz:
 @click.option('-f','--format', default='svg', help='Output format [svg, pdf, png]' , show_default=True, type=click.Choice(['svg','pdf','png']))
 @click.option('-8','--useloops', default=True, help='Use loops for duplicate nodes.\nNodes are only rendered once' , show_default=True)
 @click.option('-r','--rankdir', default='TB', help='The direction the nodes "travel": [TB, BT, LR, RL]', show_default=True, type=click.Choice(['TB','BT','LR','RL'],case_sensitive=False))
-@click.option('-t','--types', 
-help='Types of operations to track', 
-default=['apex','triggers','flows','exceptions'], 
+@click.option('-E','--exclude', 
+help='Types of operations to exclude from the graph.  Never exclude errors / exceptions.\n', 
 show_default=True, 
 multiple=True, 
-type=click.Choice(['apex','triggers','flows','callouts','dml','soql','exceptions','all'], case_sensitive=False))
+type=click.Choice(['apex','trigger','flow','callout','dml','soql','system','validation'], case_sensitive=False))
 @click.option('--no-show', default=False, is_flag=True, help='Don\'t show the graph in the default system viewer')
 @click.option('--strict', default=False, is_flag=True, help='Will only render a single edge per node regardless of loop-backs' , show_default=True)
 @click.option('-S','--stop-on-exception', default=False, is_flag=True, help='Stops processing additional operations after first exception' , show_default=True)

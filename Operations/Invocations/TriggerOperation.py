@@ -1,6 +1,8 @@
 from pprint import pp
 from Operations.EntryOrExit import ExitPoints, EntryPoints
+from Operations.LogLine import LogLine
 from Operations.Operation import Operation
+
 
 class TriggerOperation(Operation):
 
@@ -13,6 +15,8 @@ class TriggerOperation(Operation):
         self.eventId = tokens[-2]
         self.lineNumber = ll.lineNumber
         self.name = self.eventId # tokens[-1].split('/')[1]
+        self.namespace = self.name.split('.')[0] if '.' in self.name else None
+
         if(tokens[1] == 'CODE_UNIT_STARTED'):
             TriggerOperation.TRIGGERSTACK.append(self)        
         elif(tokens[1] == 'CODE_UNIT_FINISHED'):
@@ -37,4 +41,3 @@ class TriggerOperation(Operation):
         if(self.operationAction == ExitPoints.CODE_UNIT_FINISHED and stackOp.operationAction == EntryPoints.CODE_UNIT_STARTED):
             return self.name == stackOp.name
         return False
-        

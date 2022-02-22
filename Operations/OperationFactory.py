@@ -1,7 +1,9 @@
 from pickle import STACK_GLOBAL
 from pprint import pp
+from typing import Type
 from Operations.EntryOrExit import EntryOrExit
 from Operations.Invocations.FatalError import FatalErrorOp
+from Operations.LogLine import LogLine
 from Operations.Operation import Operation
 from Operations.Invocations.CalloutOperation import CalloutOperation
 from Operations.Invocations.DMLOperation import DMLOperation
@@ -17,11 +19,11 @@ class OperationFactory():
     def __init__(self, *args, **kwargs):
         self.OPERATIONS = []
         self.hitException = False
-        self.valid_ops = kwargs.get('operationTypes',[])
+        self.excluded_ops = kwargs.get('exclude',[])
         self.stop_on_exception = kwargs.get('stop-on-exception', False)
 
-    def _shouldProcess(self, optype:str):
-        return optype in self.valid_ops or 'all' in self.valid_ops
+    def _excluded(self, optype:str):
+        return optype in self.excluded_ops
 
     def createOperation(self, logLine):
         tokens:list[str]  = logLine.line.split("|");
@@ -84,16 +86,16 @@ class OperationFactory():
                 op.update(operation.__dict__)
         return operation
 
-    def createOrderedOperation(self, logLine):
+    def createOrderedOperation(self, logLine:LogLine):
         # only push operations onto the stack on operation entry
         # flows need to be handled differently (flow name isn't on the same line as the entry event)
-        tokens:list[str]  = logLine.line.split("|");
+        tokens:list[str]  = logLine.lineSplit
         op:Operation = None
         if(self.hitException == True and self.stop_on_exception):
             return None
         if(tokens and len(tokens)>1):
             opType = Operation.getType(tokens)
-            if(self._shouldProcess(opType) == False):
+            if(self._excluded(opType)):
                 return None
             if(tokens[1].startswith("METHOD_ENTRY")):
                 if(len(tokens[-2]) > 0):
@@ -121,18 +123,23 @@ class OperationFactory():
             elif(tokens[1].startswith("CODE_UNIT_STARTED")):
                 #Check if this is a trigger
                 last:str = tokens[-1]
-                if(opType == 'triggers'):
+                if(last =='TRIGGERS'):
+                    #this is a generic line that specifies that triggers are running (probably to group them all together)
+                    return None
+                elif(opType == 'trigger'):
                     op = TriggerOperation(logLine)
                     op = TriggerOperation.TRIGGERSTACK.pop()
                     op.finished = True
-                elif(opType == 'flows'):
+                elif(opType == 'flow'):
                     op = FlowOperation(logLine)
                     op.finished = False
-                elif(opType == 'workflows'):
+                elif(opType == 'workflow'):
                     pass
-                elif(opType == 'validations'):
+                elif(opType == 'validation'):
                     pass
                 elif(opType == 'duplicateDetector'):
+                    pass
+                elif(opType == 'system'):
                     pass
                 elif(opType == 'apex'):
                     op = MethodOperation(logLine)
@@ -155,8 +162,6 @@ class OperationFactory():
                 self.appendToStack(op)
                 return op
             
-
-
 
     def getOpenParentOperation(self, opIn:Operation):
         if(len(self.OPERATIONS) == 0):
@@ -191,22 +196,16 @@ class OperationFactory():
 
     def appendToStack(self, op:Operation):
         self.OPERATIONS.append(op)
+  
+  
+    def getLastOperationOfType(self, opType:Type):
+        for op in reversed(self.OPERATIONS):
+            if(op.__class__ == opType):
+                return op
+        return None
 
-    @staticmethod
-    def getLastOperation(operation)->dict:
-        if(operation is not None):
-
-            if(isinstance(operation, FlowOperation)):
-                pass
-            if(isinstance(operation, MethodOperation)):
-                pass
-            if(isinstance(operation, TriggerOperation)):
-                pass
-            if(isinstance(operation, CalloutOperation)):
-                pass
-            if(isinstance(operation, DMLOperation)):
-                pass
-            if(isinstance(operation, ExecutionOperation)):
-                pass
-
+    def getLastOperationByName(self, name:str):
+        for op in reversed(self.OPERATIONS):
+            if(op.name == name):
+                return op
         return None

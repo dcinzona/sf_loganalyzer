@@ -69,6 +69,7 @@ class renderer():
                         parentOpName = parentNodeId
                 else:
                     nodeTT += f'\n   Operation: {op.name}'
+
                 #create and style the nodes
                 g.node(nodeId, label=f'{opName}', 
                 shape='box', 
@@ -80,21 +81,31 @@ class renderer():
 
                 #create and style the edges (arrows to each node)
 
+                lmtstr:str = None
+                if(prevNode is not None and prevNode.get('limitsUsageData', None) is not None and not self.options.strict):
+                    lmtstr = '\n  Limits Usage Data:\n'
+                    lmtstr += '\n  '.join(prevNode.limitsUsageData)
+
                 edgetooltip = f'''Previous Node:
-    Line: [{op.parent.lineNumber}]
-    Type: {op.parent.eventType}
-    Name: {parentOpName}''' if op.parent is not None else ''
+    Line: [{prevNode.lineNumber}]
+    Type: {prevNode.eventType}
+    Name: {parentOpName}''' if prevNode is not None else ''
+    
+                edgetooltip += lmtstr if lmtstr is not None else ''             
+                
                 edgetooltip += f'''
     -> 
     Next Node:
     {nodeTT}'''
+                edgeLabel = f'{idx}' if lmtstr is None else f'{idx} (s)'
+                edgeLabelColor = '#000000' if lmtstr is None else '#cc2222'
                 if(idx == 0):
-                    g.edge('start', nodeId, label=f'{idx}', tooltip='Start', labeltooltip='Start of the log file')
+                    g.edge('start', nodeId, label=f'{edgeLabel}', tooltip='Start', labeltooltip='Start of the log file', fontcolor=edgeLabelColor)
                 elif(idx == len(self.operations) - 1):
-                    g.edge(parentNodeId, nodeId, label=f'{idx}', color=self._opColor(op.parent), tooltip=edgetooltip, labeltooltip=edgetooltip)
+                    g.edge(parentNodeId, nodeId, label=f'{edgeLabel}', color=self._opColor(op.parent), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor)
                     g.edge(nodeId, 'end', label=f'{len(self.operations)}', color=self._opColor(op), tooltip=edgetooltip, labeltooltip=edgetooltip)
                 else:
-                    g.edge(parentNodeId, nodeId, label=f'{idx}', color=self._opColor(op.parent), tooltip=edgetooltip, labeltooltip=edgetooltip)
+                    g.edge(parentNodeId, nodeId, label=f'{edgeLabel}', color=self._opColor(op.parent), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor)
                 
                 prevNode = op
                 
