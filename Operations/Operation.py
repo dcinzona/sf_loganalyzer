@@ -5,22 +5,25 @@ from Operations.EntryOrExit import EntryOrExit, EntryPoints, ExitPoints
 from Operations.OpUtils import dynamicDict
 from Operations.LogLine import LogLine
 
+
 class kLimit:
-    value:int = 0
-    maxValue:int = 0
+    value: int = 0
+    maxValue: int = 0
+
     def __init__(self, val, maxVal):
         self.value = val
         self.maxValue = maxVal
 
+
 class LimitData(dict):
-    def __init__(self, initializer:dict = None):
+    def __init__(self, initializer: dict = None):
         if(initializer is not None):
             super().__init__(initializer)
         else:
             self['startlimits'] = {}
             self['endlimits'] = {}
-        
-    def addLimit(self, start:bool, key:str, val:dict):
+
+    def addLimit(self, start: bool, key: str, val: dict):
         if(start):
             self['startlimits'].setdefault(key, val)
             #self['startlimits'][key] = val
@@ -30,16 +33,16 @@ class LimitData(dict):
 
 
 class Operation(dynamicDict):
-    name:str = ''
-    lineNumber:int = 0
-    timeStamp:str = None
-    eventType:str = None
-    eventId:str = None
-    eventSubType:str = None
-    operationAction:str = ''
-    operations:list = []
-    LAST_OPERATION:dict = None
-    finished:bool = False
+    name: str = ''
+    lineNumber: int = 0
+    timeStamp: str = None
+    eventType: str = None
+    eventId: str = None
+    eventSubType: str = None
+    operationAction: str = ''
+    operations: list = []
+    LAST_OPERATION: dict = None
+    finished: bool = False
     namespace = None
     limitsProcessed = 0
 
@@ -47,10 +50,10 @@ class Operation(dynamicDict):
         super(dynamicDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
 
-    def __init__(self, ll:dict):
+    def __init__(self, ll: dict):
         super(Operation, self).__init__(ll)
 
-    def __init__(self, ll:LogLine):      
+    def __init__(self, ll: LogLine):
         tokens = ll.lineSplit
         self.operationAction = tokens[1]
         self.lineNumber = ll.lineNumber
@@ -61,29 +64,29 @@ class Operation(dynamicDict):
         elif(self.get('clusterNode', False) != True):
             self.clusterNode = False
         super(Operation, self).__init__(self.__dict__)
-    
+
     # should be implemented by subclasses
-    def processLimits(self, logline:LogLine):
+    def processLimits(self, logline: LogLine):
         if(logline.additionalLines is not None and len(logline.additionalLines) > 0):
             namespace = logline.lineSplit[-2] if logline.lineSplit[-2] != '(default)' else None
             if(namespace == self.namespace):
                 Operation.limitsProcessed += 1
                 self.limitsProcessed = Operation.limitsProcessed
                 #print(f'{self.__class__.__name__}: {self.name.split(" ")[0]}[{self.lineNumber}] LIMIT USAGE:')
-                #no namespace - check if the current operation has a namespace
+                # no namespace - check if the current operation has a namespace
                 self.limitsUsageData = self.setdefault('limitsUsageData', [])
                 self.limitsUsageData = logline.additionalLines
-                print(f'{self.name}: {Operation.limitsProcessed}')
+                # print(f'{self.name}: {Operation.limitsProcessed}')
 
     def isEntry(self):
-        if(self.get('eventId','').startswith('ERROR|')):
+        if(self.get('eventId', '').startswith('ERROR|')):
             return True
         return self.operationAction in [EntryPoints.CODE_UNIT_STARTED, ExitPoints.FLOW_CREATE_INTERVIEW_END, EntryPoints.METHOD_ENTRY]
-        
+
     def isExit(self):
         return self.operationAction in ExitPoints.EXIT_POINTS
 
-    def appendTo(self, opStack:list):
+    def appendTo(self, opStack: list):
         opStack.append(self)
 
     @staticmethod
@@ -100,11 +103,11 @@ class Operation(dynamicDict):
             exit(e)
 
     @staticmethod
-    def getType(tokens:list[str]=None):
+    def getType(tokens: list[str] = None):
         if(tokens is None):
             return None
-        evnt:str = tokens[1]
-        last:str = tokens[-1].split('.')[0]
+        evnt: str = tokens[1]
+        last: str = tokens[-1].split('.')[0]
         if(evnt.startswith('METHOD_')):
             return 'apex'
         elif(evnt.startswith('FLOW_')):
@@ -126,11 +129,11 @@ class Operation(dynamicDict):
                 return 'validation'
             elif(last.startswith("DuplicateDetector")):
                 return 'duplicateDetector'
-            elif(last.lower() not in ['system','database','userInfo']):
+            elif(last.lower() not in ['system', 'database', 'userInfo']):
                 return 'apex'
         elif(evnt in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
-            #return 'exceptions'
-            return '' #always display errors / exceptions
+            # return 'exceptions'
+            return ''  # always display errors / exceptions
         return 'Unknown'
 
     # @staticmethod
@@ -155,4 +158,3 @@ class Operation(dynamicDict):
     #     pp(stack)
     #     pp(op)
     #     return None
-

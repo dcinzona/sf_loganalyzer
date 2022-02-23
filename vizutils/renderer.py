@@ -1,87 +1,125 @@
-from pprint import pp
 
+from opcode import opname
 from Operations.Invocations.FatalError import FatalErrorOp
 from Operations.Invocations.FlowOperation import FlowOperation
 from Operations.OpUtils import dynamicDict
 from Operations.Operation import Operation
 import graphviz
 
+
 class renderer():
 
     def __init__(self, *args, **kwargs) -> None:
         self.options = dynamicDict(kwargs)
+        self.nodestyle = 'filled, rounded'
         fileformat = self.options.format
         self.filename = self.options.logfile
-        self.g = graphviz.Digraph(f'{self.filename}', comment=f'Log file visualization for {self.filename}',format=fileformat)
+        self.g = graphviz.Digraph(
+            f'{self.filename}',
+            graph_attr={
+                'label': f'Log file visualization for {self.filename}', 'outputorder': 'nodesfirst'},
+            format=fileformat)
         self.useloops = kwargs.get('useloops', False)
         self.stackProcessMap = {}
-
-    def processStack(self, sortedOperations:list):
-        self.operations = sortedOperations
         self.g.strict = self.options.strict
         self.g.engine = self.options.engine
         self.g.graph_attr['rankdir'] = self.options.rankdir
-        self.g.attr('node',fontname='helveticaneue-light')
-        self.g.attr('edge',fontname='helveticaneue-light')
+        self.g.graph_attr['fontname'] = "helveticaneue-light,Helvetica,Arial,sans-serif"
+        self.g.attr(
+            'node', fontname='helveticaneue-light,Helvetica,Arial,sans-serif')
+        self.g.attr(
+            'edge', fontname='helveticaneue-light,Helvetica,Arial,sans-serif')
+
+    def processStack(self, sortedOperations: list):
+        self.operations = sortedOperations
+
         if(len(self.operations) == 0):
             raise Exception("No operations found in the log file")
-        self._checkIdx()
-        self._buildGraph(self.operations)
 
-    def _buildGraph(self, stack):
-        g = self.g
-        g.node('start', label='START', shape='Mdiamond', style='filled', fillcolor=self.lighten('#00FF00', .4), rank='min', fontsize='16')
-        g.node('end', label='END', shape='Msquare', style='filled', fillcolor=self.lighten('#00FF00', .4), rank='max', fontsize='16')
-        prevNode = None
+        self._checkIdx()
+
+        with self.g.subgraph(name='cluster_Stack', graph_attr={'labeljust': 'l',
+                                                               'outputorder': 'nodesfirst',
+                                                               'margin': '24.0',
+                                                               'rankdir': self.options.rankdir}) as g:
+
+            g.node('start', label='START', shape='invhouse', style='filled',
+                   fillcolor=self.lighten('#00FF00', .4), rank='min', fontsize='16')
+
+            self._buildGraph(g)
+
+            g.node('end', label='END', shape='house', style='filled',
+                   fillcolor=self.lighten('#00FF00', .4), rank='max', fontsize='16')
+
+        # self._buildLegendSubgraph()
+
+    def _buildLegendSubgraph(self):
+        eventTypes = []
+        for op in self.operations:
+            if(op.eventType not in eventTypes):
+                eventTypes.append(op.eventType)
+
+        with self.g.subgraph(name='cluster_Legend',
+                             node_attr={'shape': 'box',
+                                        'style': self.nodestyle,
+                                        'labeljust': 'l',
+                                        'fontsize': '12'},
+                             graph_attr={'label': 'LEGEND', 'labeljust': 'l', 'tooltip': 'LEGEND'}) \
+                as legend:
+            for eventType in eventTypes:
+                legend.node(eventType, label=eventType,
+                            color=self._eventTypeColor(eventType), fillcolor=self._opFillColor(eventType))
+
+    def _buildGraph(self, g: graphviz.Digraph) -> None:
+        self.prevNode = None
+        prevNode = self.prevNode
+
         for idx, op in enumerate(self.operations):
             try:
-                #idx = op.idx
+                if(op.operationAction == 'CODE_UNIT_STARTED'):
+                    print(op.name)
                 if(op.parent is None and idx > 0):
                     raise(Exception(f'Operation {op.name} has no parent'))
-                uid = op.nodeId
-                if(uid in self.stackProcessMap):
-                    self.stackProcessMap[uid].append(op)
-                else:
-                    self.stackProcessMap[uid] = [op]
 
                 if(prevNode is not None and prevNode.idx == op.idx):
                     continue
-                
 
-                opName = op.name.split(':')[0] if not op.name.startswith('apex:') and not isinstance(op, FlowOperation) else op.name
-                nodeId = op.nodeId
-                parentNodeId = op.parent.nodeId if op.get('parent',None) is not None else 'start'
-                #parentNodeId = prevNode.nodeId if op.parent is not None and op.idx == op.parent.idx else parentNodeId
-                parentOpName = op.parent.name if op.parent is not None else 'start'
-                
-                if(self.useloops == False):
-                    #make each node operation unique to prevent looping
-                    nodeId = f'{op.idx}{nodeId}'
-                    parentNodeId = f'{op.parent.idx}{parentNodeId}' if op.parent is not None else 'start'
+                opName = op.name.split(':')[0] if not op.name.startswith(
+                    'apex:') and not isinstance(op, FlowOperation) else op.name
+                nodeId = self._getOpNodeId(op)
+                parentNodeId = self._getOpNodeId(
+                    prevNode) if prevNode is not None else 'start'
+                parentOpName = prevNode.name if prevNode is not None else 'start'
+                nodeTT = f'Line [{op.lineNumber}]\n   {op.eventType}'
 
-                nodeTT=f'Line [{op.lineNumber}]\n   {op.eventType}'
                 if(self.options.redact):
-                    if(isinstance(op, FatalErrorOp)):              
-                        nodeTT += f'\n   {op.name}' if op.name.startswith('System.LimitException:') else f'\n   {opName}'
+
+                    if(isinstance(op, FatalErrorOp)):
+                        nodeTT += f'\n   {op.name}' if op.name.startswith(
+                            'System.LimitException:') else f'\n   {opName}'
+
                     else:
                         opName = f'{op.eventType}\nuid{op.nodeId}'
                         nodeTT += f'\n   {op.nodeId}'
                         parentOpName = parentNodeId
+
                 else:
                     nodeTT += f'\n   Operation: {op.name}'
 
-                #create and style the nodes
-                g.node(nodeId, label=f'{opName}', 
-                shape='box', 
-                color=self._opColor(op), 
-                fillcolor=self._opFillColor(op), 
-                style='filled',
-                tooltip=nodeTT,
-                )
+                urlId = f'lognode{nodeId}'
+                opName = opName.replace('<', '&lt;').replace('>', '&gt;')
+                # create and style the nodes
+                g.node(nodeId, label=f'<{opName}<BR ALIGN="LEFT"/><font POINT-SIZE="8"><b><sub>{op.eventType}</sub></b></font>>',
+                       shape='box',
+                       color=self._eventTypeColor(op.eventType),
+                       fillcolor=self._opFillColor(op.eventType),
+                       style=self.nodestyle,
+                       tooltip=nodeTT,
+                       id=urlId
+                       )
 
-                #create and style the edges (arrows to each node)
-
-                lmtstr:str = None
+                # create and style the edges (arrows to each node)
+                lmtstr: str = None
                 if(prevNode is not None and prevNode.get('limitsUsageData', None) is not None and not self.options.strict):
                     lmtstr = '\n  Limits Usage Data:\n'
                     lmtstr += '\n  '.join(prevNode.limitsUsageData)
@@ -90,78 +128,88 @@ class renderer():
     Line: [{prevNode.lineNumber}]
     Type: {prevNode.eventType}
     Name: {parentOpName}''' if prevNode is not None else ''
-    
-                edgetooltip += lmtstr if lmtstr is not None else ''             
-                
+
+                edgetooltip += lmtstr if lmtstr is not None else ''
+
                 edgetooltip += f'''
     -> 
     Next Node:
     {nodeTT}'''
                 edgeLabel = f'{idx}' if lmtstr is None else f'{idx} (s)'
                 edgeLabelColor = '#000000' if lmtstr is None else '#cc2222'
+
                 if(idx == 0):
-                    g.edge('start', nodeId, label=f'{edgeLabel}', tooltip='Start', labeltooltip='Start of the log file', fontcolor=edgeLabelColor)
+                    g.edge('start', nodeId, label=f'{edgeLabel}', tooltip='Start',
+                           labeltooltip='Start of the log file', fontcolor=edgeLabelColor)
+
                 elif(idx == len(self.operations) - 1):
-                    g.edge(parentNodeId, nodeId, label=f'{edgeLabel}', color=self._opColor(op.parent), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor)
-                    g.edge(nodeId, 'end', label=f'{len(self.operations)}', color=self._opColor(op), tooltip=edgetooltip, labeltooltip=edgetooltip)
+                    g.edge(f'{parentNodeId}', nodeId, label=f'{edgeLabel}', color=self._opColor(
+                        prevNode.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor, URL=f'#{urlId}')
+                    g.edge(f'{nodeId}', 'end', label=f'{len(self.operations)}', color=self._opColor(
+                        op.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip)
+
                 else:
-                    g.edge(parentNodeId, nodeId, label=f'{edgeLabel}', color=self._opColor(op.parent), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor)
-                
+                    g.edge(parentNodeId, nodeId,
+                           label=f'{edgeLabel}',
+                           color=self._opColor(prevNode.eventType),
+                           tooltip=edgetooltip,
+                           labeltooltip=edgetooltip,
+                           fontcolor=edgeLabelColor,
+                           URL=f'#{urlId}',
+                           constraint='true')
+
                 prevNode = op
-                
-                continue
-                if(op.get('parent', None) is not None):
-                    if(op.parent.get('children', None) is None):
-                        op.parent['children'] = []
-                        op.parent['children'].append(op)
-                    else:
-                        op.parent['children'].append(op)                
-                else:
-                    if(op.idx > 0):
-                        raise Exception(f"Operation should have a parent \n {op.__dict__}")
+
             except Exception as e:
                 print(f"Error processing operation {op}")
                 raise e
 
-    def _opColor(self, op) -> str:
-        color = '#888888'    
-        if(op.eventType == 'APEX'):
-            #add to apex cluster
-            color='#0000FF' #blue
+    def _getOpNodeId(self, op: Operation) -> str:
+        nodeId = op.nodeId
+        if(self.useloops == False):
+            # make each node operation unique to prevent looping
+            nodeId = f'{op.idx}{op.nodeId}'
+        return nodeId
+
+    def _opColor(self, evtType: str) -> str:
+        return self._eventTypeColor(evtType)
+
+    def _eventTypeColor(self, eventType) -> str:
+        color = '#888888'
+        if(eventType == 'APEX'):
+            # add to apex cluster
+            color = '#0101FF'
             pass
-        if(op.eventType == 'TRIGGER'):
-            #add to trigger cluster
-            color='#800080'
+        elif(eventType == 'TRIGGER'):
+            # add to trigger cluster
+            color = '#800180'
             pass
-        if(op.eventType == 'FLOW'):
-            #add to flow cluster
-            color='#033E3E'
+        elif(eventType == 'FLOW'):
+            # add to flow cluster
+            color = '#033E3E'
             pass
-        if(any(x in op.eventType for x in ['ERROR','EXCEPTION'])):
-            #add to flow cluster
-            color='#E42217'
-            color='#FF0000'
+        elif(any(x in eventType for x in ['ERROR', 'EXCEPTION'])):
+            color = '#FF0101'
             pass
-        if(op.eventType == 'PROCESS BUILDER'):
-            #add to flow cluster
-            color='#008080'
+        elif(eventType == 'PROCESS BUILDER'):
+            # add to flow cluster
+            color = '#418855'
             pass
         return color.lower()
 
-    def _opFillColor(self, op) -> str:
-        return self.lighten(self._opColor(op), .8) 
+    def _opFillColor(self, eventType: str) -> str:
+        return self.lighten(self._eventTypeColor(eventType), .7)
 
     def lighten(self, hex, amount):
         """ Lighten an RGB color by an amount (between 0 and 1),
 
         e.g. lighten('#4290e5', .5) = #C1FFFF
         """
-        hex = hex.replace('#','')
+        hex = hex.replace('#', '')
         red = min(255, int(hex[0:2], 16) + 255 * amount)
         green = min(255, int(hex[2:4], 16) + 255 * amount)
         blue = min(255, int(hex[4:6], 16) + 255 * amount)
         return "#%X%X%X" % (int(red), int(green), int(blue))
-
 
     def _checkIdx(self) -> None:
         if(len(self.operations) == 0):
@@ -179,12 +227,22 @@ class renderer():
                     continue
                 op._nodeId = f'({idx})'
 
-
-    
-    def _printStack(self, prefix:str='', inputStack:list[Operation]=None, suffix:str=''):
+    def _printStack(self, prefix: str = '', inputStack: list[Operation] = None, suffix: str = ''):
         arr = self.operations if inputStack is None else inputStack
         if(len(arr) == 0):
             raise Exception("No operations found in the log file")
         for op in arr:
             outstr = f' > {op.idx} {prefix} [{op.lineNumber}] {op.eventType} | {op.name} | {op.finished} {suffix}'
             print(outstr)
+
+    def _setparentstack(self, op):
+        if(op.get('parent', None) is not None):
+            if(op.parent.get('children', None) is None):
+                op.parent['children'] = []
+                op.parent['children'].append(op)
+            else:
+                op.parent['children'].append(op)
+        else:
+            if(op.idx > 0):
+                raise Exception(
+                    f"Operation should have a parent \n {op.__dict__}")
