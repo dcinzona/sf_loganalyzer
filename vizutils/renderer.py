@@ -87,10 +87,10 @@ class renderer():
         subclusters = [g]
         for idx, op in enumerate(self.operations):
             self._validateOperations(op, idx)
-            if(idx > 18):
-                exit()
-            else:
-                print(f'\n\n{op}')
+            # if(idx > 18):
+            #     exit()
+            # else:
+            #     print(f'\n\n{op}')
             try:
                 if(op.isClusterOp):
                     clusterIdx += 1
