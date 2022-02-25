@@ -87,6 +87,10 @@ class renderer():
         subclusters = [g]
         for idx, op in enumerate(self.operations):
             self._validateOperations(op, idx)
+            if(idx > 18):
+                exit()
+            else:
+                print(f'\n\n{op}')
             try:
                 if(op.isClusterOp):
                     clusterIdx += 1
@@ -104,7 +108,7 @@ class renderer():
 
             except Exception as e:
                 print(
-                    f"Error processing operation {op.name} [{op.lineNumber}]")
+                    f"Error processing operation {op}")
                 raise e
         for graph in subclusters:
             # g.subgraph(graph)

@@ -70,6 +70,17 @@ class Operation(dynamicDict):
             self.clusterNode = False
         super(Operation, self).__init__(self.__dict__)
 
+    def __str__(self):
+        obj: dict = {}
+        for k, v in self.items():
+            if(k not in ['parent', 'children', 'll']):
+                if(k == 'LIMIT_USAGE_FOR_NS'):
+                    obj[k] = len(v)
+                else:
+                    obj[k] = v if not isinstance(
+                        v, dynamicDict) else {v.__class__.__name__: f'[{v.lineNumber}] {v.eventId}'}
+        return obj.__repr__()
+
     @property
     def safeName(self):
         if(Operation.REDACT):
