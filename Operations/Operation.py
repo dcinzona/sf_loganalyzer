@@ -33,6 +33,7 @@ class LimitData(dict):
 
 
 class Operation(dynamicDict):
+    # instance properties
     name: str = ''
     lineNumber: int = 0
     timeStamp: str = None
@@ -40,11 +41,15 @@ class Operation(dynamicDict):
     eventId: str = None
     eventSubType: str = None
     operationAction: str = ''
-    operations: list = []
-    LAST_OPERATION: dict = None
     finished: bool = False
-    namespace = None
+    namespace = '(default)'
     limitsProcessed = 0
+    LIMIT_USAGE_FOR_NS = []
+    PREV_OPERATION: 'Operation' = None
+    NEXT_OPERATION: 'Operation' = None
+
+    # static properties
+    REDACT: bool = False
 
     def __init__(self, *args, **kwargs):
         super(dynamicDict, self).__init__(*args, **kwargs)
@@ -65,18 +70,28 @@ class Operation(dynamicDict):
             self.clusterNode = False
         super(Operation, self).__init__(self.__dict__)
 
+    @property
+    def safeName(self):
+        if(Operation.REDACT):
+            return self.nodeId
+        escStr = self.name.replace('<', '&lt;').replace('>', '&gt;')
+        return escStr.split(':')[0] if ':' in escStr and not escStr.startswith('apex:') else escStr
+
+    @property
+    def isClusterOp(self) -> bool:
+        """When a Code Unit has LIMIT_USAGE_FOR_NS data, it is a cluster operation
+
+        Returns:
+            bool: Whether the operation represents a cluster of operations
+        """
+        return len(self.get('LIMIT_USAGE_FOR_NS', [])) > 0
+
     # should be implemented by subclasses
     def processLimits(self, logline: LogLine):
         if(logline.additionalLines is not None and len(logline.additionalLines) > 0):
-            namespace = logline.lineSplit[-2] if logline.lineSplit[-2] != '(default)' else None
+            namespace = logline.lineSplit[-2]
             if(namespace == self.namespace):
-                Operation.limitsProcessed += 1
-                self.limitsProcessed = Operation.limitsProcessed
-                #print(f'{self.__class__.__name__}: {self.name.split(" ")[0]}[{self.lineNumber}] LIMIT USAGE:')
-                # no namespace - check if the current operation has a namespace
-                self.limitsUsageData = self.setdefault('limitsUsageData', [])
-                self.limitsUsageData = logline.additionalLines
-                # print(f'{self.name}: {Operation.limitsProcessed}')
+                self.LIMIT_USAGE_FOR_NS = logline.additionalLines
 
     def isEntry(self):
         if(self.get('eventId', '').startswith('ERROR|')):
@@ -88,19 +103,6 @@ class Operation(dynamicDict):
 
     def appendTo(self, opStack: list):
         opStack.append(self)
-
-    @staticmethod
-    def print(cls, msg=None):
-        return
-        #print(json.dumps(self, default=lambda x: x.__dict__, indent=4, sort_keys=True))
-        try:
-            ln = f'[{cls.lineNumber}] {cls.eventType}|{cls.name}' if msg is None else f'[{cls.lineNumber}] {msg}'
-            print(ln)
-        except Exception as e:
-            pp(traceback.format_exc())
-            print(cls.lineNumber)
-            print(cls.__class__)
-            exit(e)
 
     @staticmethod
     def getType(tokens: list[str] = None):

@@ -1,4 +1,5 @@
 
+from cProfile import label
 from opcode import opname
 from Operations.Invocations.FatalError import FatalErrorOp
 from Operations.Invocations.FlowOperation import FlowOperation
@@ -8,6 +9,8 @@ import graphviz
 
 
 class renderer():
+
+    operations: list[Operation] = []
 
     def __init__(self, *args, **kwargs) -> None:
         self.options = dynamicDict(kwargs)
@@ -38,18 +41,27 @@ class renderer():
 
         self._checkIdx()
 
-        with self.g.subgraph(name='cluster_Stack', graph_attr={'labeljust': 'l',
+        with self.g.subgraph(name='cluster_Stack', graph_attr={'labeljust': 'c',
                                                                'outputorder': 'nodesfirst',
                                                                'margin': '24.0',
-                                                               'rankdir': self.options.rankdir}) as g:
+                                                               'rankdir': self.options.rankdir,
+                                                               'style': "invis",
+                                                               'ordering': "out"}) as g:
 
             g.node('start', label='START', shape='invhouse', style='filled',
                    fillcolor=self.lighten('#00FF00', .4), rank='min', fontsize='16')
 
             self._buildGraph(g)
 
-            g.node('end', label='END', shape='house', style='filled',
-                   fillcolor=self.lighten('#00FF00', .4), rank='max', fontsize='16')
+            with g.subgraph(name='cluster_End', graph_attr={'labeljust': 'c',
+                                                            'outputorder': 'nodesfirst',
+                                                            'margin': '24.0',
+                                                            'rankdir': self.options.rankdir,
+                                                            'style': "invis",
+                                                            'ordering': "in"}) as g:
+
+                g.node('end', label='END', shape='invhouse', style='filled',
+                       fillcolor=self.lighten('#00FF00', .4), rank='max', fontsize='16')
 
         # self._buildLegendSubgraph()
 
@@ -71,98 +83,151 @@ class renderer():
                             color=self._eventTypeColor(eventType), fillcolor=self._opFillColor(eventType))
 
     def _buildGraph(self, g: graphviz.Digraph) -> None:
-        self.prevNode = None
-        prevNode = self.prevNode
-
+        clusterIdx = 0
+        subclusters = [g]
         for idx, op in enumerate(self.operations):
+            self._validateOperations(op, idx)
             try:
-                if(op.operationAction == 'CODE_UNIT_STARTED'):
-                    print(op.name)
-                if(op.parent is None and idx > 0):
-                    raise(Exception(f'Operation {op.name} has no parent'))
+                if(op.isClusterOp):
+                    clusterIdx += 1
+                    graph = graphviz.Digraph(
+                        f'cluster_{clusterIdx}')
+                    graph.graph_attr['label'] = f'{op.safeName}'
+                    graph.graph_attr[
+                        'tooltip'] = f'{op.safeName}\n{self._getLimitDataString(op)}'
+                    graph.graph_attr['style'] = ''
+                    graph.graph_attr['rank'] = 'max'
+                    # subclusters.append(graph)
 
-                if(prevNode is not None and prevNode.idx == op.idx):
-                    continue
-
-                opName = op.name.split(':')[0] if not op.name.startswith(
-                    'apex:') and not isinstance(op, FlowOperation) else op.name
-                nodeId = self._getOpNodeId(op)
-                parentNodeId = self._getOpNodeId(
-                    prevNode) if prevNode is not None else 'start'
-                parentOpName = prevNode.name if prevNode is not None else 'start'
-                nodeTT = f'Line [{op.lineNumber}]\n   {op.eventType}'
-
-                if(self.options.redact):
-
-                    if(isinstance(op, FatalErrorOp)):
-                        nodeTT += f'\n   {op.name}' if op.name.startswith(
-                            'System.LimitException:') else f'\n   {opName}'
-
-                    else:
-                        opName = f'{op.eventType}\nuid{op.nodeId}'
-                        nodeTT += f'\n   {op.nodeId}'
-                        parentOpName = parentNodeId
-
-                else:
-                    nodeTT += f'\n   Operation: {op.name}'
-
-                urlId = f'lognode{nodeId}'
-                opName = opName.replace('<', '&lt;').replace('>', '&gt;')
-                # create and style the nodes
-                g.node(nodeId, label=f'<{opName}<BR ALIGN="LEFT"/><font POINT-SIZE="8"><b><sub>{op.eventType}</sub></b></font>>',
-                       shape='box',
-                       color=self._eventTypeColor(op.eventType),
-                       fillcolor=self._opFillColor(op.eventType),
-                       style=self.nodestyle,
-                       tooltip=nodeTT,
-                       id=urlId
-                       )
-
-                # create and style the edges (arrows to each node)
-                lmtstr: str = None
-                if(prevNode is not None and prevNode.get('limitsUsageData', None) is not None and not self.options.strict):
-                    lmtstr = '\n  Limits Usage Data:\n'
-                    lmtstr += '\n  '.join(prevNode.limitsUsageData)
-
-                edgetooltip = f'''Previous Node:
-    Line: [{prevNode.lineNumber}]
-    Type: {prevNode.eventType}
-    Name: {parentOpName}''' if prevNode is not None else ''
-
-                edgetooltip += lmtstr if lmtstr is not None else ''
-
-                edgetooltip += f'''
-    -> 
-    Next Node:
-    {nodeTT}'''
-                edgeLabel = f'{idx}' if lmtstr is None else f'{idx} (s)'
-                edgeLabelColor = '#000000' if lmtstr is None else '#cc2222'
-
-                if(idx == 0):
-                    g.edge('start', nodeId, label=f'{edgeLabel}', tooltip='Start',
-                           labeltooltip='Start of the log file', fontcolor=edgeLabelColor)
-
-                elif(idx == len(self.operations) - 1):
-                    g.edge(f'{parentNodeId}', nodeId, label=f'{edgeLabel}', color=self._opColor(
-                        prevNode.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor, URL=f'#{urlId}')
-                    g.edge(f'{nodeId}', 'end', label=f'{len(self.operations)}', color=self._opColor(
-                        op.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip)
-
-                else:
-                    g.edge(parentNodeId, nodeId,
-                           label=f'{edgeLabel}',
-                           color=self._opColor(prevNode.eventType),
-                           tooltip=edgetooltip,
-                           labeltooltip=edgetooltip,
-                           fontcolor=edgeLabelColor,
-                           URL=f'#{urlId}',
-                           constraint='true')
-
-                prevNode = op
+                self._loadNodesAndEdgesIntoGraph(
+                    subclusters[-1], op, idx, clusterIdx)
 
             except Exception as e:
-                print(f"Error processing operation {op}")
+                print(
+                    f"Error processing operation {op.name} [{op.lineNumber}]")
                 raise e
+        for graph in subclusters:
+            # g.subgraph(graph)
+            pass
+
+    def _loadNodesAndEdgesIntoGraph(self, g: graphviz.Digraph, op: Operation, idx: int, clusterIdx: int = 0) -> None:
+        opName = op.safeName
+        # f'{self._getOpNodeId(op)}{clusterIdx}' if op.isClusterOp == False else f'{self._getOpNodeId(op)}{clusterIdx-1}'
+        nodeId = self._getOpNodeId(op)
+        parentNodeId = self._getOpNodeId(
+            op.PREV_OPERATION) if op.PREV_OPERATION is not None else 'start'
+        parentOpName = op.PREV_OPERATION.safeName if op.PREV_OPERATION is not None else 'start'
+        nodeTT = self._getNodeTooltip(op)
+
+        if(self.options.redact):
+            if(isinstance(op, FatalErrorOp)):
+                nodeTT += f'\n   {op.safeName}'
+
+            else:
+                opName = f'UID: {op.nodeId}'
+                nodeTT += f'\n   {op.nodeId}'
+                parentOpName = parentNodeId
+
+        else:
+            nodeTT += f'\n   Operation: {op.safeName}'
+
+        nodeTT += self._getLimitDataString(op)
+
+        urlId = f'lognode{nodeId}'
+        # create and style the nodes
+        g.node(nodeId, label=f'<{opName}<BR ALIGN="LEFT"/><font POINT-SIZE="8"><b><sub>{op.eventType}</sub></b></font>>',
+               shape='box',
+               color=self._eventTypeColor(op.eventType),
+               fillcolor=self._opFillColor(op.eventType),
+               style=self.nodestyle,
+               tooltip=self._getNodeTooltip(op),
+               id=urlId,
+               rank=f'{"max"}' if op.isClusterOp else f'{"same"}',
+               )
+
+        # create and style the edges (arrows to each node)
+        lmtstr: str = None
+        if(op.PREV_OPERATION is not None and op.PREV_OPERATION.isClusterOp and not self.options.strict):
+            lmtstr = f'\nLimits Usage Data:\nNamespace: {op.PREV_OPERATION.namespace}\n  '
+            lmtstr += '\n  '.join(op.PREV_OPERATION.LIMIT_USAGE_FOR_NS)
+
+        edgetooltip = f'''Previous Node:
+                            LogLine: [{op.PREV_OPERATION.lineNumber}]
+                            Type: {op.PREV_OPERATION.eventType}
+                            Name: {parentOpName}''' if op.PREV_OPERATION is not None else ''
+
+        edgetooltip += f'''\nNext Node:
+                            {nodeTT}\n'''
+
+        edgetooltip += lmtstr if lmtstr is not None else ''
+        edgetooltip = edgetooltip.replace(
+            '                                ', '')
+
+        edgeLabel = f'{idx}' if lmtstr is None else f'{idx} (s)'
+        edgeLabelColor = '#000000' if lmtstr is None else '#cc2222'
+        edgePenWidth = '1.0' if lmtstr is None else '3.0'
+        tail = 'start' if idx == 0 else parentNodeId
+        head = 'end' if op.NEXT_OPERATION is None else nodeId
+
+        if(idx == 0):
+            g.edge(tail, head, label=f'{edgeLabel}', tooltip='Start',
+                   labeltooltip='Start of the log file', fontcolor=edgeLabelColor, penwidth=edgePenWidth)
+
+        elif(idx == len(self.operations) - 1):
+            g.edge(f'{parentNodeId}', nodeId, label=f'{edgeLabel}', color=self._opColor(
+                op.PREV_OPERATION.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor, URL=f'#{urlId}', penwidth=edgePenWidth)
+            g.edge(f'{nodeId}', 'end', label=f'{len(self.operations)}', color=self._opColor(
+                op.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, penwidth=edgePenWidth)
+
+        else:
+            self._addEdge(g,
+                          parentNodeId,
+                          nodeId,
+                          edgeLabel,
+                          color=self._opColor(
+                              op.PREV_OPERATION.eventType),
+                          tooltip=edgetooltip,
+                          labeltooltip=edgetooltip,
+                          fontcolor=edgeLabelColor,
+                          URL=f'#{urlId}',
+                          penwidth=edgePenWidth,
+                          constraint='true')
+
+    def _getNodeTooltip(self, op: Operation) -> str:
+        tt = f'Line [{op.lineNumber}]\n   {op.eventType}'
+
+        if(self.options.redact):
+            tt += f'\n   {op.safeName}' if isinstance(
+                op, FatalErrorOp) else f'\n   Operation Unique ID: ({op.idx})'
+        else:
+            tt += f'\n   Operation: {op.safeName}'
+
+        return tt
+
+    def _getLimitDataString(self, op: Operation) -> str:
+        if(len(op.LIMIT_USAGE_FOR_NS) == 0):
+            return ''
+
+        lmtstr = '\nLimits Usage Data:\n  '
+        lmtstr += '\n  '.join(op.LIMIT_USAGE_FOR_NS)
+
+        return lmtstr
+
+    def _addEdge(self, g: graphviz.Digraph, tail: str, head: str, label: str, _attributes=None, **kwargs):
+        g.edge(tail, head, label, **kwargs)
+
+    def _validateOperations(self, op: Operation, idx: int) -> None:
+        if(op.PREV_OPERATION is None and idx > 0):
+            raise(
+                Exception(f'Operation [{idx}] {op.name} has no previous operation'))
+
+        if(op.PREV_OPERATION is not None and op.PREV_OPERATION.eventId == op.eventId):
+            raise(
+                Exception(f'Operation [{idx}] {op.name} is a duplicate of [{op.PREV_OPERATION.name}]'))
+
+        if(op.NEXT_OPERATION is not None and op.eventId == op.NEXT_OPERATION.eventId):
+            raise(
+                Exception(f'Operation [{idx}] {op.name} is a duplicate of [{op.NEXT_OPERATION.name}]'))
 
     def _getOpNodeId(self, op: Operation) -> str:
         nodeId = op.nodeId

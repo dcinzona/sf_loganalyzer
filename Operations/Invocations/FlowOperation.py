@@ -4,21 +4,20 @@ from Operations.LogLine import LogLine
 from Operations.OpUtils import dynamicDict
 from Operations.Operation import LimitData, Operation
 
-    
-    
+
 class FlowOperation(Operation):
 
-    FLOWSTACK:list = []
+    FLOWSTACK: list = []
     FLOW_WITH_LIMITS = None
-    CREATE_INTERVIEW_TYPE:str = None
+    CREATE_INTERVIEW_TYPE: str = None
     CURRENT_FLOW = None
 
     # have to check the previous line to determine if this is a flow or a process builder
     # seems like process builders all have the last element in the previous line starting with 301r
     # flows don't have that last element, so they start with 300r
-    def __init__(self, ll:LogLine):        
+    def __init__(self, ll: LogLine):
         super(FlowOperation, self).__init__(ll)
-        tokens = ll.lineSplit        
+        tokens = ll.lineSplit
         self.line = ll.line
         self.lineSplit = ll.lineSplit
         if(len(tokens[-1]) == 0):
@@ -34,8 +33,8 @@ class FlowOperation(Operation):
         elif(tokens[1] == "CODE_UNIT_FINISHED"):
             d = FlowOperation.FLOWSTACK.pop()
             self.update(d)
-            self.finished = True            
-        elif(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN",'FLOW_INTERVIEW_FINISHED']):
+            self.finished = True
+        elif(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN", 'FLOW_INTERVIEW_FINISHED']):
             d = self.getFlowFromStack(tokens[2])
             if(d is not None):
                 self.update(d)
@@ -43,13 +42,13 @@ class FlowOperation(Operation):
                 #     self.__setattr__(key, d.get(key))
                 if(tokens[1].endswith('_FINISHED')):
                     self.finished = True
-                    #FlowOperation.LAST_OPERATION = FlowOperation.FLOWSTACK[i]#.pop(i)
+                    # FlowOperation.LAST_OPERATION = FlowOperation.FLOWSTACK[i]#.pop(i)
             else:
                 pp(FlowOperation.FLOWSTACK)
                 raise Exception(f'{tokens[2]} not found in stack')
             #FlowOperation.FLOW_WITH_LIMITS = self
             #FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
-        
+
         elif(tokens[1].endswith("_LIMIT_USAGE")):
             self.update(FlowOperation.FLOWSTACK[-1])
             self.setFlowLimitUsage(tokens)
@@ -57,35 +56,34 @@ class FlowOperation(Operation):
             # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_LIMIT_USAGE|Flow Unique ID|Flow Name
             if(FlowOperation.FLOW_WITH_LIMITS is not None):
                 for key in FlowOperation.FLOW_WITH_LIMITS:
-                    self.__setattr__(key, FlowOperation.FLOW_WITH_LIMITS.get(key))
+                    self.__setattr__(
+                        key, FlowOperation.FLOW_WITH_LIMITS.get(key))
                 self.setFlowLimitUsage(tokens)
                 FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
 
-
     def appendToStack(self):
         FlowOperation.FLOWSTACK.append(self)
-        #self.appendTo(FlowOperation.FLOWSTACK)
-        #FlowOperation.FLOWSTACK.append(self.__dict__.copy())
+        # self.appendTo(FlowOperation.FLOWSTACK)
+        # FlowOperation.FLOWSTACK.append(self.__dict__.copy())
 
-    def getFlowFromStack(self,eventId:str):
+    def getFlowFromStack(self, eventId: str):
         for f in FlowOperation.FLOWSTACK[::-1]:
             if(f.eventId == eventId):
                 #print(f'1: {f.eventId} == {eventId}')
-                return f #, FlowOperation.FLOWSTACK.index(f)
+                return f  # , FlowOperation.FLOWSTACK.index(f)
             else:
                 #print(f'0: {f.eventId} != {eventId}')
-                #f.print(self)
+                # f.print(self)
                 pass
         pp(FlowOperation.FLOWSTACK)
         raise Exception(f'{eventId} not found in stack')
 
-    def codeUnitStarted(self, tokens:list=None):
+    def codeUnitStarted(self, tokens: list = None):
         self.name = tokens[-1]
         self.eventType = 'FLOW_WRAPPER'
         self.appendToStack()
-    
-    
-    def flowCreateInterviewBegin(self, tokens:list=None):
+
+    def flowCreateInterviewBegin(self, tokens: list = None):
         FlowOperation.LAST_OPERATION = None
         """
         Description: Used to identify whether flow is a process builder or a flow
@@ -98,31 +96,31 @@ class FlowOperation(Operation):
         FlowOperation.CREATE_INTERVIEW_TYPE = self.getFlowType(tokens)
         self.eventType = 'FLOW_WRAPPER'
         self.appendToStack()
-    
-    def flowCreateInterviewEnd(self, tokens:list=None, lineNumber:int=None):
+
+    def flowCreateInterviewEnd(self, tokens: list = None, lineNumber: int = None):
         """
         Description: Sets the unique ID of the flow interview
         """
         # 15:09:38.105 (6113904308)|FLOW_CREATE_INTERVIEW_END|Flow Unique ID|Flow Name
         if(len(FlowOperation.FLOWSTACK) > 0):
-            f = FlowOperation.FLOWSTACK[-1] #dynamicDict(FlowOperation.FLOWSTACK[-1])
+            # dynamicDict(FlowOperation.FLOWSTACK[-1])
+            f = FlowOperation.FLOWSTACK[-1]
             if(f.eventType == 'FLOW_WRAPPER'):
                 FlowOperation.CURRENT_FLOW = FlowOperation.FLOWSTACK.pop()
             else:
-                FlowOperation.CURRENT_FLOW = f#f.__dict__.copy()
+                FlowOperation.CURRENT_FLOW = f  # f.__dict__.copy()
         else:
             raise Exception("No flows in the stack.  This is a bug")
-        
-        #self.update(FlowOperation.CURRENT_FLOW)
+
+        # self.update(FlowOperation.CURRENT_FLOW)
         self.eventId = tokens[2]
         self.name = tokens[-1]
         self.eventType = FlowOperation.CREATE_INTERVIEW_TYPE
         self.eventSubType = 'FLOW_CREATE_INTERVIEW_END'
-        self.lineNumber = lineNumber # if self.lineNumber is None else self.lineNumber
+        self.lineNumber = lineNumber  # if self.lineNumber is None else self.lineNumber
         self.appendToStack()
-    
-        
-    def getFlowType(self, tokens:list=None):
+
+    def getFlowType(self, tokens: list = None):
         if(len(tokens)) == 4:
             return "FLOW"
 
@@ -156,5 +154,12 @@ class FlowOperation(Operation):
             limitName = limitArray[0].strip()
             limitValue = limitArray[1].strip().split('out of')[0].strip()
             limitMax = limitArray[1].strip().split('out of')[1].strip()
-            self.limits.addLimit(start=operationAction.startswith('FLOW_START_INTERVIEW_'), key=limitName, val={'_used':limitValue, 'out_of':limitMax})
+            self.limits.addLimit(start=operationAction.startswith(
+                'FLOW_START_INTERVIEW_'), key=limitName, val={'_used': limitValue, 'out_of': limitMax})
             self.FLOW_WITH_LIMITS['limits'] = self.limits
+
+    @property
+    def safeName(self):
+        if(Operation.REDACT):
+            return self.nodeId
+        return self.name.replace('<', '&lt;').replace('>', '&gt;')

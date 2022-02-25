@@ -12,25 +12,26 @@ from Operations.Invocations.FlowOperation import FlowOperation
 from Operations.Invocations.MethodOperation import MethodOperation
 from Operations.Invocations.TriggerOperation import TriggerOperation
 
+
 class OperationFactory():
-    OPERATIONS:list[Operation] = []
-    hitException:bool = False
+    OPERATIONS: list[Operation] = []
+    hitException: bool = False
 
     def __init__(self, *args, **kwargs):
         self.OPERATIONS = []
         self.hitException = False
-        self.excluded_ops = kwargs.get('exclude',[])
+        self.excluded_ops = kwargs.get('exclude', [])
         self.stop_on_exception = kwargs.get('stop-on-exception', False)
 
-    def _excluded(self, optype:str):
+    def _excluded(self, optype: str):
         return optype in self.excluded_ops
 
     def createOperation(self, logLine):
-        tokens:list[str]  = logLine.line.split("|");
+        tokens: list[str] = logLine.line.split("|")
         operation = None
         if(self.hitException == True and self.stop_on_exception):
             return None
-        if(tokens and len(tokens)>1):
+        if(tokens and len(tokens) > 1):
             opType = Operation.getType(tokens)
             if(tokens[1].startswith("METHOD_") and self._shouldProcess(opType)):
                 if(len(tokens[-2]) > 0):
@@ -44,13 +45,13 @@ class OperationFactory():
                 pass
                 # operation = ExecutionOperation(tokens, logLine.lineNumber);
             elif(tokens[1].startswith("CALLOUT") and self._shouldProcess(opType)):
-                operation = CalloutOperation(logLine);
+                operation = CalloutOperation(logLine)
             elif(tokens[1].startswith("FLOW_") and self._shouldProcess(opType)):
                 if(tokens[1] in EntryOrExit.ALL):
-                    operation = FlowOperation(logLine);
+                    operation = FlowOperation(logLine)
             elif(tokens[1].startswith("CODE_UNIT_") and self._shouldProcess(opType)):
-                #Check if this is a trigger
-                last:str = tokens[-1]
+                # Check if this is a trigger
+                last: str = tokens[-1]
                 if(opType == 'triggers'):
                     operation = TriggerOperation(logLine)
                 elif(opType == 'flows'):
@@ -70,10 +71,11 @@ class OperationFactory():
                 if(self.findInStack(operation) is None):
                     lastOp = self.getOpenParentOperation(operation)
                     if(lastOp is not None):
-                        operation.parent = lastOp if operation.get('parent', None) is None else operation.parent
+                        operation.parent = lastOp if operation.get(
+                            'parent', None) is None else operation.parent
                 return operation
 
-        #The operation here is based on the log line, so it may already be in the stack
+        # The operation here is based on the log line, so it may already be in the stack
         if(operation is not None):
             if(operation.get('parent', None) == None and operation.isEntry()):
                 operation.parent = self.getOpenParentOperation(operation)
@@ -86,20 +88,21 @@ class OperationFactory():
                 op.update(operation.__dict__)
         return operation
 
-    def createOrderedOperation(self, logLine:LogLine):
+    def createOrderedOperation(self, logLine: LogLine):
         # only push operations onto the stack on operation entry
         # flows need to be handled differently (flow name isn't on the same line as the entry event)
-        tokens:list[str]  = logLine.lineSplit
-        op:Operation = None
+        tokens: list[str] = logLine.lineSplit
+        op: Operation = None
         if(self.hitException == True and self.stop_on_exception):
             return None
-        if(tokens and len(tokens)>1):
+        if(tokens and len(tokens) > 1):
             opType = Operation.getType(tokens)
             if(self._excluded(opType)):
                 return None
             if(tokens[1].startswith("METHOD_ENTRY")):
                 if(len(tokens[-2]) > 0):
-                    isCustomMethod = tokens[-1].split('.')[0] not in ['System','Database','UserInfo']
+                    isCustomMethod = tokens[-1].split('.')[0] not in [
+                        'System', 'Database', 'UserInfo']
                     if(isCustomMethod):
                         op = MethodOperation(logLine)
                         op = MethodOperation.METHODSTACK.pop()
@@ -121,10 +124,10 @@ class OperationFactory():
                         op = FlowOperation.FLOWSTACK.pop()
                         op.finished = True
             elif(tokens[1].startswith("CODE_UNIT_STARTED")):
-                #Check if this is a trigger
-                last:str = tokens[-1]
-                if(last =='TRIGGERS'):
-                    #this is a generic line that specifies that triggers are running (probably to group them all together)
+                # Check if this is a trigger
+                last: str = tokens[-1]
+                if(last == 'TRIGGERS'):
+                    # this is a generic line that specifies that triggers are running (probably to group them all together)
                     return None
                 elif(opType == 'trigger'):
                     op = TriggerOperation(logLine)
@@ -150,7 +153,7 @@ class OperationFactory():
                 self.hitException = True
                 op = FatalErrorOp(logLine)
                 op.finished = True
-            
+
             prev = self.OPERATIONS[-1] if len(self.OPERATIONS) > 0 else None
             if(op is not None and op.finished):
                 if(op.get('parent', None) == None and prev is not None):
@@ -159,11 +162,11 @@ class OperationFactory():
                     op.parent = prev
                 else:
                     op.parent = None
+
                 self.appendToStack(op)
                 return op
-            
 
-    def getOpenParentOperation(self, opIn:Operation):
+    def getOpenParentOperation(self, opIn: Operation):
         if(len(self.OPERATIONS) == 0):
             return None
         for op in self.OPERATIONS[::-1]:
@@ -171,8 +174,7 @@ class OperationFactory():
                 return op
         return None
 
-
-    def findInStack(self, op:Operation) -> Operation:
+    def findInStack(self, op: Operation) -> Operation:
         if(len(self.OPERATIONS) == 0):
             self.appendToStack(op)
             return op
@@ -190,21 +192,29 @@ class OperationFactory():
                     pp(op)
                     pp(stackOp)
                     raise e
-        # wasn't found in the stack so add it 
+        # wasn't found in the stack so add it
         self.appendToStack(op)
         return None
 
-    def appendToStack(self, op:Operation):
+    def appendToStack(self, op: Operation):
+        """Every time we add an operation to the stack, set the previous operation and the next operation
+
+        Args:
+            op (Operation): The operation to add to the stack
+        """
+        if(len(self.OPERATIONS) > 0):
+            op.PREV_OPERATION = self.OPERATIONS[-1]
+            if(op.PREV_OPERATION is not None):
+                op.PREV_OPERATION.NEXT_OPERATION = op
         self.OPERATIONS.append(op)
-  
-  
-    def getLastOperationOfType(self, opType:Type):
+
+    def getLastOperationOfType(self, opType: Type):
         for op in reversed(self.OPERATIONS):
             if(op.__class__ == opType):
                 return op
         return None
 
-    def getLastOperationByName(self, name:str):
+    def getLastOperationByName(self, name: str):
         for op in reversed(self.OPERATIONS):
             if(op.name == name):
                 return op
