@@ -1,9 +1,7 @@
-
-from pprint import pp
-import traceback
-from Operations.EntryOrExit import EntryOrExit, EntryPoints, ExitPoints
+from Operations.EntryOrExit import EntryPoints, ExitPoints
 from Operations.OpUtils import dynamicDict
 from Operations.LogLine import LogLine
+from pprintpp import pformat
 
 
 class kLimit:
@@ -72,14 +70,23 @@ class Operation(dynamicDict):
 
     def __str__(self):
         obj: dict = {}
+        # from pprint import pformat
         for k, v in self.items():
-            if(k not in ['parent', 'children', 'll']):
+            if(k not in ['parent', 'children', 'lineNumber', 'line', 'lineSplit']):
                 if(k == 'LIMIT_USAGE_FOR_NS'):
                     obj[k] = len(v)
+                elif(k == '_nodeId'):
+                    obj['nodeId'] = self.nodeId
+                elif(k == 'll'):
+                    obj['logline'] = f'[{self.lineNumber}] {v.line}'
+                elif(isinstance(v, dynamicDict)):
+                    obj[k] = {
+                        v.__class__.__name__: f'[{v.lineNumber}] {v.eventId}'}
                 else:
-                    obj[k] = v if not isinstance(
-                        v, dynamicDict) else {v.__class__.__name__: f'[{v.lineNumber}] {v.eventId}'}
-        return obj.__repr__()
+                    obj[k] = v
+
+        # return pformat(vars(obj), indent=4, width=1)
+        return f'{self.__class__.__name__}({pformat(obj, indent=4, width=1)})'
 
     @property
     def safeName(self):

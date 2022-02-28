@@ -1,6 +1,7 @@
 
 from cProfile import label
 from opcode import opname
+from pprint import pp
 from Operations.Invocations.FatalError import FatalErrorOp
 from Operations.Invocations.FlowOperation import FlowOperation
 from Operations.OpUtils import dynamicDict
@@ -87,10 +88,6 @@ class renderer():
         subclusters = [g]
         for idx, op in enumerate(self.operations):
             self._validateOperations(op, idx)
-            # if(idx > 18):
-            #     exit()
-            # else:
-            #     print(f'\n\n{op}')
             try:
                 if(op.isClusterOp):
                     clusterIdx += 1
@@ -115,6 +112,12 @@ class renderer():
             pass
 
     def _loadNodesAndEdgesIntoGraph(self, g: graphviz.Digraph, op: Operation, idx: int, clusterIdx: int = 0) -> None:
+
+        if(op.isClusterOp):
+            print(f'[{op.lineNumber}] {op.LIMIT_USAGE_FOR_NS[0]}')
+            print(op.clusterId)
+            pass
+
         opName = op.safeName
         # f'{self._getOpNodeId(op)}{clusterIdx}' if op.isClusterOp == False else f'{self._getOpNodeId(op)}{clusterIdx-1}'
         nodeId = self._getOpNodeId(op)
@@ -138,17 +141,6 @@ class renderer():
         nodeTT += self._getLimitDataString(op)
 
         urlId = f'lognode{nodeId}'
-        # create and style the nodes
-        g.node(nodeId, label=f'<{opName}<BR ALIGN="LEFT"/><font POINT-SIZE="8"><b><sub>{op.eventType}</sub></b></font>>',
-               shape='box',
-               color=self._eventTypeColor(op.eventType),
-               fillcolor=self._opFillColor(op.eventType),
-               style=self.nodestyle,
-               tooltip=self._getNodeTooltip(op),
-               id=urlId,
-               rank=f'{"max"}' if op.isClusterOp else f'{"same"}',
-               )
-
         # create and style the edges (arrows to each node)
         lmtstr: str = None
         if(op.PREV_OPERATION is not None and op.PREV_OPERATION.isClusterOp and not self.options.strict):
@@ -167,35 +159,43 @@ class renderer():
         edgetooltip = edgetooltip.replace(
             '                                ', '')
 
+        isLastOp = op == self.operations[-1]
         edgeLabel = f'{idx}' if lmtstr is None else f'{idx} (s)'
         edgeLabelColor = '#000000' if lmtstr is None else '#cc2222'
         edgePenWidth = '1.0' if lmtstr is None else '3.0'
-        tail = 'start' if idx == 0 else parentNodeId
-        head = 'end' if op.NEXT_OPERATION is None else nodeId
+        tail = parentNodeId if idx > 0 else 'start'
+        head = nodeId
+        nodeColor = self._opColor(
+            op.PREV_OPERATION.eventType) if idx > 0 and not isLastOp else self._opColor(op.eventType)
 
-        if(idx == 0):
-            g.edge(tail, head, label=f'{edgeLabel}', tooltip='Start',
-                   labeltooltip='Start of the log file', fontcolor=edgeLabelColor, penwidth=edgePenWidth)
+        self._addEdge(g,
+                      tail,
+                      head,
+                      edgeLabel,
+                      color=nodeColor,
+                      tooltip=edgetooltip,
+                      labeltooltip=edgetooltip,
+                      fontcolor=edgeLabelColor,
+                      URL=f'#{urlId}',
+                      penwidth=edgePenWidth,
+                      constraint='true')
 
-        elif(idx == len(self.operations) - 1):
-            g.edge(f'{parentNodeId}', nodeId, label=f'{edgeLabel}', color=self._opColor(
-                op.PREV_OPERATION.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, fontcolor=edgeLabelColor, URL=f'#{urlId}', penwidth=edgePenWidth)
-            g.edge(f'{nodeId}', 'end', label=f'{len(self.operations)}', color=self._opColor(
+        if(isLastOp):
+            g.edge(nodeId, 'end', label=f'{len(self.operations)}', color=self._opColor(
                 op.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, penwidth=edgePenWidth)
 
-        else:
-            self._addEdge(g,
-                          parentNodeId,
-                          nodeId,
-                          edgeLabel,
-                          color=self._opColor(
-                              op.PREV_OPERATION.eventType),
-                          tooltip=edgetooltip,
-                          labeltooltip=edgetooltip,
-                          fontcolor=edgeLabelColor,
-                          URL=f'#{urlId}',
-                          penwidth=edgePenWidth,
-                          constraint='true')
+        # create and style the nodes
+        nodepenwidth = '3.0' if len(op.LIMIT_USAGE_FOR_NS) > 0 else '1.0'
+        g.node(nodeId, label=f'<{opName}<BR ALIGN="LEFT"/><font POINT-SIZE="8"><b><sub>{op.eventType}</sub></b></font>>',
+               shape='box',
+               color=self._eventTypeColor(op.eventType),
+               fillcolor=self._opFillColor(op.eventType),
+               style=self.nodestyle,
+               tooltip=self._getNodeTooltip(op),
+               id=urlId,
+               rank=f'{"max"}' if op.isClusterOp else f'{"same"}',
+               penwidth=nodepenwidth,
+               )
 
     def _getNodeTooltip(self, op: Operation) -> str:
         tt = f'Line [{op.lineNumber}]\n   {op.eventType}'
@@ -283,18 +283,23 @@ class renderer():
     def _checkIdx(self) -> None:
         if(len(self.operations) == 0):
             raise Exception("No operations found in the log file")
+
         if('idx' not in self.operations[0]):
             for idx, op in enumerate(self.operations):
                 op['idx'] = idx
+
         if(self.options.redact or True):
             uniques = []
+
             for op in self.operations:
                 idx = uniques.index(op.nodeId) if op.nodeId in uniques else -1
+
                 if(idx == -1):
                     uniques.append(f'{op.nodeId}')
-                    op._nodeId = f'({len(uniques)-1})'
+                    op._nodeId = f'{op.__class__.__name__}({len(uniques)-1})'
                     continue
-                op._nodeId = f'({idx})'
+
+                op._nodeId = f'{op.__class__.__name__}({idx})'
 
     def _printStack(self, prefix: str = '', inputStack: list[Operation] = None, suffix: str = ''):
         arr = self.operations if inputStack is None else inputStack
@@ -306,11 +311,8 @@ class renderer():
 
     def _setparentstack(self, op):
         if(op.get('parent', None) is not None):
-            if(op.parent.get('children', None) is None):
-                op.parent['children'] = []
-                op.parent['children'].append(op)
-            else:
-                op.parent['children'].append(op)
+            op.parent.setdefault('children', [])
+            op.parent['children'].append(op)
         else:
             if(op.idx > 0):
                 raise Exception(
