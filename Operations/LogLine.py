@@ -1,19 +1,6 @@
-import copy
 import re
 
-timestampPattern = re.compile("^(?P<time>\d{2}:\d{2}:\d{2}\.)")
-
-
-class Cluster(object):
-    start: int
-    end: int
-    data: dict
-
-    def __init__(self, start: int = 0, end: int = 0, data: dict = {}):
-        self.start = start
-        self.end = end
-        # Or if you don't have lots of nested objects, data.copy()
-        self.data = data.copy()
+timestampPattern = re.compile(r"^(?P<time>\d{2}:\d{2}:\d{2}\.)")
 
 
 class LogLine(object):
@@ -23,7 +10,7 @@ class LogLine(object):
     def copy(self) -> 'LogLine':
         new_instance = LogLine(self.line, self.lineNumber)
         new_instance.__dict__.update(self.__dict__)
-        #new_instance.additionalLines = copy.deepcopy(self.additionalLines)
+        # new_instance.additionalLines = copy.deepcopy(self.additionalLines)
         return new_instance
 
     def __init__(self, lineString: str, lineNumber: int = 0):
@@ -51,10 +38,11 @@ class SOQLQueryLogLine(LogLine):
 
     SEARCH_STRING = "SOQL queries"
 
-    def isValidLine(self, line):
+    def isValidLine(self, line, prevLine: LogLine, idx: int = 0):
         isValid = timestampPattern.match(
             line) is not None and line.find('|Validation:') == -1
 
-        # if(isValid == False and line.find(self.SEARCH_STRING) != -1 and prevLine.endswith('|LIMIT_USAGE_FOR_NS|(default)|')):
-        #     return True, f'{prevLine}{line}'
+        if(isValid is False and line.find(self.SEARCH_STRING) != -1
+           and prevLine.endswith('|LIMIT_USAGE_FOR_NS|(default)|')):
+            return True, f'{prevLine}{line}'
         return isValid, line

@@ -1,6 +1,7 @@
 import os
 from Operations.Invocations.FlowOperation import FlowOperation
-from Operations.LogLine import LogLine, Cluster
+from Operations.LogLine import LogLine
+from Operations.Cluster import Cluster
 from Operations.OpUtils import dynamicDict
 from Operations.OperationFactory import OperationFactory
 
@@ -32,16 +33,20 @@ class reader:
     def read(self):
         codeunitList: list[LogLine] = []
         with open(self.logpath) as infile:
-            self.lineCount = 0  # for tracking actual log lines in the file vs operations
+            # for tracking actual log lines in the file vs operations
+            self.lineCount = 0
             self.lastValidLine = None  # for tracking limits lines
-            # for processing lines that were technically invalid (i.e. limits lines with no timestamp)
+            # for processing lines that were technically invalid
+            # (i.e. limits lines with no timestamp)
             self.processedInvalid = False
-            # for getting the log line for the last code unit entered (defined by finished)
+            # for getting the log line for the last code unit entered
+            # (defined by finished)
             self.getNextCodeUnitFinished = False
             # need to keep track of codeunits for clustering
             for line in infile:
                 self.lineCount += 1  # we read a line
-                # will generate a logline object instance if this is a valid line (timestamp and |)
+                # will generate a logline object instance if this is a
+                # valid line (timestamp and |)
                 isValid, ll = LogLine.isValidLine(line.strip(), self.lineCount)
                 if(isValid):
                     # cluster tracking
@@ -51,8 +56,10 @@ class reader:
                         lastCodeUnitLine = codeunitList.pop()
 
                     if(self.processedInvalid is True):
-                        # finished processing lines that did not have a timestamp and now processing the next valid line
-                        # (so we need to reset the flag and process the last valid line if it's a limits line)
+                        # finished processing lines that did not have
+                        # a timestamp and now processing the next valid line
+                        # (so we need to reset the flag and process the last
+                        #  valid line if it's a limits line)
                         self.processedInvalid = False
                         if(self.lastValidLine.isLimitsLine()):
                             self.limitUsageLines.append(
@@ -64,17 +71,23 @@ class reader:
                     self.loglines.append(line)
                     self.factory.createOrderedOperation(ll)
 
-                    if(self.getNextCodeUnitFinished and ll.lineSplit[1] == 'CODE_UNIT_FINISHED' and len(self.limitUsageLines) > 0):
+                    if(self.getNextCodeUnitFinished is True
+                       and ll.lineSplit[1] == 'CODE_UNIT_FINISHED'
+                       and len(self.limitUsageLines) > 0):
+
                         self.getNextCodeUnitFinished = False
+                        # this is the line range of the cluster
                         cluster = Cluster(
-                            start=int(lastCodeUnitLine.lineNumber), end=int(ll.lineNumber))  # this is the line range of the cluster
+                            start=int(lastCodeUnitLine.lineNumber),
+                            end=int(ll.lineNumber))
                         cluster.name = ll.lineSplit[-1]
 
                         # add the limits lines to the cluster instance
                         for ln in self.limitUsageLines:
                             ns = ln.lineSplit[-2]
                             cluster.data[ns] = [
-                                x.strip() for x in ln.additionalLines if x.strip() != '']
+                                x.strip() for x in ln.additionalLines
+                                if x.strip() != '']
 
                         self.clusters.append(cluster)
                         self.limitUsageLines.clear()
@@ -83,46 +96,64 @@ class reader:
 
                 else:
                     # line didn't have a timestamp or pipe character
-                    if(self.lastValidLine is not None and self.lastValidLine.isLimitsLine()):
+                    if(self.lastValidLine is not None
+                       and self.lastValidLine.isLimitsLine()):
+                        # this is a limits line that has no timestamp
                         self.lastValidLine.addLine(line)
                         self.processedInvalid = True
 
-            if(len(self.clusters) > 14):
-                for idx, c in enumerate(self.clusters):
-                    print(c.data)
-                    print(idx)
-                    # print(c) if c.data['(default)'][0].strip(
-                    # ) == 'Number of SOQL queries: 2 out of 100' else print(c)
-            # exit() if len(self.clusters) > 20 else None
-
             # self.clusters = sorted(self.clusters, key=lambda x: x.start)
+            # self.rootClusterStack = ClusterStack()
+            # self.rootClusterStack.clusters = self.clusters
+            # self.operations = []
             for idx, cluster in enumerate(self.clusters):
                 cluster.id = f'cluster{idx}'
                 cluster.operations = [
-                    op for op in self.operations if op.lineNumber >= cluster.start and op.lineNumber < cluster.end]
+                    op.clone() for op in self.operations
+                    # op for op in self.operations
+                    if op.lineNumber >= cluster.start
+                    and op.lineNumber < cluster.end]
 
-                # pp(f'({cluster.id})[{cluster.start} - {cluster.end}] {cluster.name} | Child Ops: {len(cluster.operations)}')
                 for op in cluster.operations:
                     if(op.lineNumber == cluster.start):
                         op_ns = op.namespace
                         op.LIMIT_USAGE_FOR_NS = cluster.data.get(op_ns, [])
-                        print(op_ns)
-                        print(op.LIMIT_USAGE_FOR_NS[0])
-                    op.cluster = cluster
-                    op.clusterId = op.cluster.id
-                    print(f'\t[{op.lineNumber}] {op.name} | {op.clusterId}')
+
+                        print(op_ns) if self.options.debug else None
+                        print(
+                            op.LIMIT_USAGE_FOR_NS[0]) if self.options.debug else None
+                    if(op.get('cluster', None) is None):
+                        op.cluster = cluster
+                        op.clusterId = op.cluster.id
+                        op._nodeId = f'{op.cluster.id}_{op.nodeId}'
+
+                    print(
+                        f'\t[{op.lineNumber}] {op.name} | {op.clusterId}') if self.options.debug else None
+
+            for op in self.operations:
+                if(op.get('clusterId', None) is None):
+                    for cluster in self.clusters:
+                        if(op.lineNumber >= cluster.start and op.lineNumber < cluster.end):
+                            op.cluster = cluster
+                            op.clusterId = op.cluster.id
+                            op._nodeId = f'{op.cluster.id}_{op.nodeId}'
+                            print(
+                                f'\t[{op.lineNumber}] {op.name} | {op.clusterId} | {op.nodeId}')
+                else:
+                    print(op.nodeId)
 
             self.clusters = list(filter(lambda n: len(
                 n.operations) > 0, self.clusters))
 
-        if(self.options.get('debug', False)):
+        if(self.options.debug):
             openOps = 0
             opCountsByType = {}
             for idx, op in enumerate(self.operations):
-                if(op.finished == False):
+                if(op.finished is False):
                     openOps += 1
                     print(
-                        f'{idx} [{op.lineNumber}] "{op.name}" <{op.eventId}> is not finished')
+                        f'{idx} [{op.lineNumber}] "{op.name}" \
+                        <{op.eventId}> is not finished')
                 clsName = op.__class__.__name__
                 if(isinstance(op, FlowOperation)):
                     clsName = op.eventType

@@ -1,4 +1,3 @@
-from pickle import STACK_GLOBAL
 from pprint import pp
 from typing import Type
 from Operations.EntryOrExit import EntryOrExit
@@ -20,16 +19,20 @@ class OperationFactory():
     def __init__(self, *args, **kwargs):
         self.OPERATIONS = []
         self.hitException = False
-        self.excluded_ops = kwargs.get('exclude', [])
+        self.excluded_ops = kwargs.get(
+            'exclude', ())
+        # default exclusions until implemented
+        self.excluded_ops = (*self.excluded_ops, *tuple(
+            ["dml", "execution", "callout"]))
         self.stop_on_exception = kwargs.get('stop-on-exception', False)
 
     def _excluded(self, optype: str):
         return optype in self.excluded_ops
 
-    def createOperation(self, logLine):
+    def createStackedOperation(self, logLine):
         tokens: list[str] = logLine.line.split("|")
         operation = None
-        if(self.hitException == True and self.stop_on_exception):
+        if(self.hitException and self.stop_on_exception):
             return None
         if(tokens and len(tokens) > 1):
             opType = Operation.getType(tokens)
@@ -51,7 +54,6 @@ class OperationFactory():
                     operation = FlowOperation(logLine)
             elif(tokens[1].startswith("CODE_UNIT_") and self._shouldProcess(opType)):
                 # Check if this is a trigger
-                last: str = tokens[-1]
                 if(opType == 'triggers'):
                     operation = TriggerOperation(logLine)
                 elif(opType == 'flows'):
@@ -77,7 +79,7 @@ class OperationFactory():
 
         # The operation here is based on the log line, so it may already be in the stack
         if(operation is not None):
-            if(operation.get('parent', None) == None and operation.isEntry()):
+            if(operation.get('parent', None) is None and operation.isEntry()):
                 operation.parent = self.getOpenParentOperation(operation)
             operation.tokens = tokens
             if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
@@ -93,7 +95,7 @@ class OperationFactory():
         # flows need to be handled differently (flow name isn't on the same line as the entry event)
         tokens: list[str] = logLine.lineSplit
         op: Operation = None
-        if(self.hitException == True and self.stop_on_exception):
+        if(self.hitException and self.stop_on_exception):
             return None
         if(tokens and len(tokens) > 1):
             opType = Operation.getType(tokens)
@@ -108,14 +110,11 @@ class OperationFactory():
                         op = MethodOperation.METHODSTACK.pop()
                         op.finished = True
             elif(tokens[1].startswith("DML_")):
-                pass
-                #op = DMLOperation(logLine)
+                op = DMLOperation(logLine)
             elif(tokens[1].startswith("EXECUTION_")):
-                pass
-                #op = ExecutionOperation(logLine)
+                op = ExecutionOperation(logLine)
             elif(tokens[1].startswith("CALLOUT")):
-                pass
-                #op = CalloutOperation(logLine)
+                op = CalloutOperation(logLine)
             elif(tokens[1].startswith("FLOW_")):
                 if(tokens[1] in ['FLOW_CREATE_INTERVIEW_BEGIN', 'FLOW_CREATE_INTERVIEW_END']):
                     op = FlowOperation(logLine)
@@ -156,7 +155,7 @@ class OperationFactory():
 
             prev = self.OPERATIONS[-1] if len(self.OPERATIONS) > 0 else None
             if(op is not None and op.finished):
-                if(op.get('parent', None) == None and prev is not None):
+                if(op.get('parent', None) is None and prev is not None):
                     if(prev.eventId == op.eventId):
                         return None
                     op.parent = prev
@@ -170,7 +169,7 @@ class OperationFactory():
         if(len(self.OPERATIONS) == 0):
             return None
         for op in self.OPERATIONS[::-1]:
-            if(op.get('finished', False) == False and op.eventId != opIn.eventId):
+            if(op.get('finished', False) is False and op.eventId != opIn.eventId):
                 return op
         return None
 
@@ -183,7 +182,7 @@ class OperationFactory():
             if(stackOp.eventId == op.eventId):
                 stackOp.update(op.__dict__)
                 return op
-            elif(isinstance(op, FlowOperation) == False):
+            elif(isinstance(op, FlowOperation) is False):
                 try:
                     if(stackOp.name == op.name and stackOp.eventType == op.eventType and stackOp.eventSubType == op.eventSubType):
                         stackOp.update(op.__dict__)
@@ -198,14 +197,14 @@ class OperationFactory():
 
     def appendToStack(self, op: Operation):
         """Every time we add an operation to the stack, set the previous operation and the next operation
-
+           PrevOp <- op -> NextOp
         Args:
             op (Operation): The operation to add to the stack
         """
         if(len(self.OPERATIONS) > 0):
-            op.PREV_OPERATION = self.OPERATIONS[-1]
-            if(op.PREV_OPERATION is not None):
-                op.PREV_OPERATION.NEXT_OPERATION = op
+            # op.PREV_OPERATION = self.OPERATIONS[-1]
+            # self.OPERATIONS[-1].NEXT_OPERATION = op
+            pass
         self.OPERATIONS.append(op)
 
     def getLastOperationOfType(self, opType: Type):

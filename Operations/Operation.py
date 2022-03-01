@@ -24,10 +24,10 @@ class LimitData(dict):
     def addLimit(self, start: bool, key: str, val: dict):
         if(start):
             self['startlimits'].setdefault(key, val)
-            #self['startlimits'][key] = val
+            # self['startlimits'][key] = val
         else:
             self['endlimits'].setdefault(key, val)
-            #self['endlimits'][key] = val
+            # self['endlimits'][key] = val
 
 
 class Operation(dynamicDict):
@@ -49,30 +49,36 @@ class Operation(dynamicDict):
     # static properties
     REDACT: bool = False
 
-    def __init__(self, *args, **kwargs):
-        super(dynamicDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+    # def __init__(self, *args, **kwargs):
+    #     super(dynamicDict, self).__init__(*args, **kwargs)
+    #     self.__dict__ = self
+    #     raise Exception(f'{self.__class__.__name__} is an abstract class')
 
-    def __init__(self, ll: dict):
-        super(Operation, self).__init__(ll)
+    def clone(self) -> 'Operation':
+        op = dynamicDict(self.__dict__)
+        op.__dict__ = self.__dict__
+        op.__class__ = self.__class__
+        return op
 
     def __init__(self, ll: LogLine):
         tokens = ll.lineSplit
         self.operationAction = tokens[1]
         self.lineNumber = ll.lineNumber
         self.ll = ll
-        self.timeStamp = tokens[0] if self.timeStamp is None else self.timeStamp
+        self.timeStamp = tokens[0] if \
+            self.timeStamp is None else self.timeStamp
         if(self.operationAction in [EntryPoints.CODE_UNIT_STARTED]):
             self.clusterNode = True
-        elif(self.get('clusterNode', False) != True):
+        elif(self.get('clusterNode', False) is not True):
             self.clusterNode = False
         super(Operation, self).__init__(self.__dict__)
 
     def __str__(self):
         obj: dict = {}
+        skipProps = ['parent', 'children', 'lineNumber', 'line', 'lineSplit']
         # from pprint import pformat
         for k, v in self.items():
-            if(k not in ['parent', 'children', 'lineNumber', 'line', 'lineSplit']):
+            if(k not in skipProps):
                 if(k == 'LIMIT_USAGE_FOR_NS'):
                     obj[k] = len(v)
                 elif(k == '_nodeId'):
@@ -93,7 +99,9 @@ class Operation(dynamicDict):
         if(Operation.REDACT):
             return self.nodeId
         escStr = self.name.replace('<', '&lt;').replace('>', '&gt;')
-        return escStr.split(':')[0] if ':' in escStr and not escStr.startswith('apex:') else escStr
+        return escStr.split(':')[0] if ':' in escStr \
+            and not escStr.startswith('apex:') \
+            else escStr
 
     @property
     def isClusterOp(self) -> bool:
@@ -106,7 +114,9 @@ class Operation(dynamicDict):
 
     # should be implemented by subclasses
     def processLimits(self, logline: LogLine):
-        if(logline.additionalLines is not None and len(logline.additionalLines) > 0):
+        if(logline.additionalLines is not None
+                and len(logline.additionalLines) > 0):
+
             namespace = logline.lineSplit[-2]
             if(namespace == self.namespace):
                 self.LIMIT_USAGE_FOR_NS = logline.additionalLines
@@ -114,7 +124,9 @@ class Operation(dynamicDict):
     def isEntry(self):
         if(self.get('eventId', '').startswith('ERROR|')):
             return True
-        return self.operationAction in [EntryPoints.CODE_UNIT_STARTED, ExitPoints.FLOW_CREATE_INTERVIEW_END, EntryPoints.METHOD_ENTRY]
+        return self.operationAction in [EntryPoints.CODE_UNIT_STARTED,
+                                        ExitPoints.FLOW_CREATE_INTERVIEW_END,
+                                        EntryPoints.METHOD_ENTRY]
 
     def isExit(self):
         return self.operationAction in ExitPoints.EXIT_POINTS
@@ -155,26 +167,3 @@ class Operation(dynamicDict):
             # return 'exceptions'
             return ''  # always display errors / exceptions
         return 'Unknown'
-
-    # @staticmethod
-    # def findSelfinStack(op, stack:list[dict], eventIdOnly=False) -> dict:
-    #     if(len(stack) > 0):
-    #         for i in range(len(stack)-1, -1, -1):
-    #             sop = stack[i]
-    #             if(sop.get('eventId') == op.eventId):
-    #                 return stack.pop(i)
-    #             if(eventIdOnly == False):
-    #                 try:
-    #                     if(sop.get('name') == op.name and sop.get('eventType') == op.eventType, sop.get('eventSubType') == op.eventSubType):
-    #                         return stack.pop(i)
-    #                     # if(sop.eventType == op.eventType and sop.eventSubType == op.eventSubType):
-    #                     #     return sop,i
-    #                 except Exception:
-    #                     print(traceback.format_exc())
-    #                     print(op)
-    #                     pp(stack[i])
-    #                     exit()
-    #     print(f'{op.name} not found in stack :(')
-    #     pp(stack)
-    #     pp(op)
-    #     return None
