@@ -7,7 +7,7 @@ class LogLine(object):
     operation = None
     stackOperation = None
 
-    def copy(self) -> 'LogLine':
+    def copy(self) -> "LogLine":
         new_instance = LogLine(self.line, self.lineNumber)
         new_instance.__dict__.update(self.__dict__)
         # new_instance.additionalLines = copy.deepcopy(self.additionalLines)
@@ -25,12 +25,11 @@ class LogLine(object):
         return self
 
     def isLimitsLine(self):
-        return self.lineSplit[1] == 'LIMIT_USAGE_FOR_NS'
+        return self.lineSplit[1] == "LIMIT_USAGE_FOR_NS"
 
     @staticmethod
     def isValidLine(line: str, idx: int = 0):
-        isValid = timestampPattern.match(
-            line) is not None and line.find('|') != -1
+        isValid = timestampPattern.match(line) is not None and line.find("|") != -1
         return isValid, LogLine(line, idx)
 
 
@@ -39,10 +38,14 @@ class SOQLQueryLogLine(LogLine):
     SEARCH_STRING = "SOQL queries"
 
     def isValidLine(self, line, prevLine: LogLine, idx: int = 0):
-        isValid = timestampPattern.match(
-            line) is not None and line.find('|Validation:') == -1
+        isValid = (
+            timestampPattern.match(line) is not None and line.find("|Validation:") == -1
+        )
 
-        if(isValid is False and line.find(self.SEARCH_STRING) != -1
-           and prevLine.endswith('|LIMIT_USAGE_FOR_NS|(default)|')):
-            return True, f'{prevLine}{line}'
+        if (
+            isValid is False
+            and line.find(self.SEARCH_STRING) != -1
+            and prevLine.endswith("|LIMIT_USAGE_FOR_NS|(default)|")
+        ):
+            return True, f"{prevLine}{line}"
         return isValid, line

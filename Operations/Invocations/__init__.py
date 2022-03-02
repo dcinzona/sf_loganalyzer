@@ -6,5 +6,12 @@ from Operations.Invocations.MethodOperation import MethodOperation
 from Operations.Invocations.TriggerOperation import TriggerOperation
 from Operations.Invocations.FatalError import FatalErrorOp
 
-__all__ = ('CalloutOperation', 'DMLOperation', 'ExecutionOperation',
-           'FatalErrorOp', 'FlowOperation', 'MethodOperation', 'TriggerOperation')
+__all__ = (
+    "CalloutOperation",
+    "DMLOperation",
+    "ExecutionOperation",
+    "FatalErrorOp",
+    "FlowOperation",
+    "MethodOperation",
+    "TriggerOperation",
+)

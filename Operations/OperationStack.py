@@ -1,4 +1,5 @@
 from Operations.Operation import Operation
+
 # LIFO Stack implementation using a linked list
 # as its underlying storage
 
@@ -11,9 +12,9 @@ class OperationStack:
     class Node:
         def __init__(self, e: Operation):
             self.element = e
-            self.next = None   # reference to the next Node
+            self.next = None  # reference to the next Node
 
-# ---------------------- stack methods -------------------------
+    # ---------------------- stack methods -------------------------
     # Create an empty stack
     def __init__(self):
         self._size = 0
@@ -32,7 +33,7 @@ class OperationStack:
     # (i.e., LIFO). Raise exception if the stack is empty.
     def pop(self) -> Operation:
         if self.is_empty():
-            raise IndexError('Stack is empty')
+            raise IndexError("Stack is empty")
 
         elementToReturn = self.head.element
         self.head = self.head.next
@@ -44,7 +45,7 @@ class OperationStack:
     # the stack. Raise Empty exception if the stack is empty.
     def peek(self) -> Operation:
         if self.is_empty():
-            raise IndexError('Stack is empty')
+            raise IndexError("Stack is empty")
         return self.head.element
 
     # Return True if the stack is empty.

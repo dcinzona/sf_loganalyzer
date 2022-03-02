@@ -12,7 +12,7 @@ class FlowOperation(Operation):
 
     @property
     def color(self):
-        color = '#033E3E' if self.eventType == 'FLOW' else '#418855'  # process builder
+        color = "#033E3E" if self.eventType == "FLOW" else "#418855"  # process builder
         return color
 
     # have to check the previous line to determine if this is a flow or a process builder
@@ -23,44 +23,43 @@ class FlowOperation(Operation):
         tokens = ll.lineSplit
         self.line = ll.line
         self.lineSplit = ll.lineSplit
-        if(len(tokens[-1]) == 0):
+        if len(tokens[-1]) == 0:
             tokens.pop()
-            self.eventType = 'FLOW'
+            self.eventType = "FLOW"
         # tokens.pop() if tokens[-1] == '' else None
-        if(tokens[1] == 'CODE_UNIT_STARTED'):
+        if tokens[1] == "CODE_UNIT_STARTED":
             self.codeUnitStarted(tokens)
-        elif(tokens[1] == "FLOW_CREATE_INTERVIEW_BEGIN"):
+        elif tokens[1] == "FLOW_CREATE_INTERVIEW_BEGIN":
             self.flowCreateInterviewBegin(tokens)
-        elif(tokens[1] == "FLOW_CREATE_INTERVIEW_END"):
+        elif tokens[1] == "FLOW_CREATE_INTERVIEW_END":
             self.flowCreateInterviewEnd(tokens, ll.lineNumber)
-        elif(tokens[1] == "CODE_UNIT_FINISHED"):
+        elif tokens[1] == "CODE_UNIT_FINISHED":
             d = FlowOperation.FLOWSTACK.pop()
             self.update(d)
             self.finished = True
-        elif(tokens[1] in ["FLOW_START_INTERVIEW_BEGIN", 'FLOW_INTERVIEW_FINISHED']):
+        elif tokens[1] in ["FLOW_START_INTERVIEW_BEGIN", "FLOW_INTERVIEW_FINISHED"]:
             d = self.getFlowFromStack(tokens[2])
-            if(d is not None):
+            if d is not None:
                 self.update(d)
                 # for key in d.__dict__:
                 #     self.__setattr__(key, d.get(key))
-                if(tokens[1].endswith('_FINISHED')):
+                if tokens[1].endswith("_FINISHED"):
                     self.finished = True
                     # FlowOperation.LAST_OPERATION = FlowOperation.FLOWSTACK[i]#.pop(i)
             else:
                 pp(FlowOperation.FLOWSTACK)
-                raise Exception(f'{tokens[2]} not found in stack')
+                raise Exception(f"{tokens[2]} not found in stack")
             # FlowOperation.FLOW_WITH_LIMITS = self
             # FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
 
-        elif(tokens[1].endswith("_LIMIT_USAGE")):
+        elif tokens[1].endswith("_LIMIT_USAGE"):
             self.update(FlowOperation.FLOWSTACK[-1])
             self.setFlowLimitUsage(tokens)
             return
             # 15:09:38.311 (6311977364)|FLOW_START_INTERVIEW_LIMIT_USAGE|Flow Unique ID|Flow Name
-            if(FlowOperation.FLOW_WITH_LIMITS is not None):
+            if FlowOperation.FLOW_WITH_LIMITS is not None:
                 for key in FlowOperation.FLOW_WITH_LIMITS:
-                    self.__setattr__(
-                        key, FlowOperation.FLOW_WITH_LIMITS.get(key))
+                    self.__setattr__(key, FlowOperation.FLOW_WITH_LIMITS.get(key))
                 self.setFlowLimitUsage(tokens)
                 FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
 
@@ -71,7 +70,7 @@ class FlowOperation(Operation):
 
     def getFlowFromStack(self, eventId: str):
         for f in FlowOperation.FLOWSTACK[::-1]:
-            if(f.eventId == eventId):
+            if f.eventId == eventId:
                 # print(f'1: {f.eventId} == {eventId}')
                 return f  # , FlowOperation.FLOWSTACK.index(f)
             else:
@@ -79,11 +78,11 @@ class FlowOperation(Operation):
                 # f.print(self)
                 pass
         pp(FlowOperation.FLOWSTACK)
-        raise Exception(f'{eventId} not found in stack')
+        raise Exception(f"{eventId} not found in stack")
 
     def codeUnitStarted(self, tokens: list = None):
         self.name = tokens[-1]
-        self.eventType = 'FLOW_WRAPPER'
+        self.eventType = "FLOW_WRAPPER"
         self.appendToStack()
 
     def flowCreateInterviewBegin(self, tokens: list = None):
@@ -97,7 +96,7 @@ class FlowOperation(Operation):
         # 15:09:38.310 (6310353162)|FLOW_CREATE_INTERVIEW_BEGIN|00Dr00000002V3c|300r00000001oDh|301r0000000kzyr
         FlowOperation.FLOW_WITH_LIMITS = None
         FlowOperation.CREATE_INTERVIEW_TYPE = self.getFlowType(tokens)
-        self.eventType = 'FLOW_WRAPPER'
+        self.eventType = "FLOW_WRAPPER"
         self.appendToStack()
 
     def flowCreateInterviewEnd(self, tokens: list = None, lineNumber: int = None):
@@ -105,10 +104,10 @@ class FlowOperation(Operation):
         Description: Sets the unique ID of the flow interview
         """
         # 15:09:38.105 (6113904308)|FLOW_CREATE_INTERVIEW_END|Flow Unique ID|Flow Name
-        if(len(FlowOperation.FLOWSTACK) > 0):
+        if len(FlowOperation.FLOWSTACK) > 0:
             # dynamicDict(FlowOperation.FLOWSTACK[-1])
             f = FlowOperation.FLOWSTACK[-1]
-            if(f.eventType == 'FLOW_WRAPPER'):
+            if f.eventType == "FLOW_WRAPPER":
                 FlowOperation.CURRENT_FLOW = FlowOperation.FLOWSTACK.pop()
             else:
                 FlowOperation.CURRENT_FLOW = f  # f.__dict__.copy()
@@ -119,15 +118,15 @@ class FlowOperation(Operation):
         self.eventId = tokens[2]
         self.name = tokens[-1]
         self.eventType = FlowOperation.CREATE_INTERVIEW_TYPE
-        self.eventSubType = 'FLOW_CREATE_INTERVIEW_END'
+        self.eventSubType = "FLOW_CREATE_INTERVIEW_END"
         self.lineNumber = lineNumber  # if self.lineNumber is None else self.lineNumber
         self.appendToStack()
 
     def getFlowType(self, tokens: list = None):
-        if(len(tokens)) == 4:
+        if (len(tokens)) == 4:
             return "FLOW"
 
-        return 'PROCESS BUILDER'
+        return "PROCESS BUILDER"
 
     def setFlowLimitUsage(self, tokens):
         # 15:09:38.311 (6312006106)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 12 out of 100
@@ -142,12 +141,12 @@ class FlowOperation(Operation):
         # 15:09:38.311 (6312200540)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 0 out of 50
         # 15:09:38.311 (6312207873)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
         # 15:09:38.311 (6312215669)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
-        if(len(tokens)) == 3:
-            if('limits' not in self.FLOW_WITH_LIMITS):
+        if (len(tokens)) == 3:
+            if "limits" not in self.FLOW_WITH_LIMITS:
                 self.limits = LimitData()
-                self.FLOW_WITH_LIMITS['limits'] = self.limits
+                self.FLOW_WITH_LIMITS["limits"] = self.limits
             else:
-                limits = self.FLOW_WITH_LIMITS['limits']
+                limits = self.FLOW_WITH_LIMITS["limits"]
                 self.limits = LimitData(limits)
                 for k in limits:
                     self.limits[k] = limits[k]
@@ -155,14 +154,17 @@ class FlowOperation(Operation):
             operationAction = tokens[1]
             limitArray = limitToken.split(":")
             limitName = limitArray[0].strip()
-            limitValue = limitArray[1].strip().split('out of')[0].strip()
-            limitMax = limitArray[1].strip().split('out of')[1].strip()
-            self.limits.addLimit(start=operationAction.startswith(
-                'FLOW_START_INTERVIEW_'), key=limitName, val={'_used': limitValue, 'out_of': limitMax})
-            self.FLOW_WITH_LIMITS['limits'] = self.limits
+            limitValue = limitArray[1].strip().split("out of")[0].strip()
+            limitMax = limitArray[1].strip().split("out of")[1].strip()
+            self.limits.addLimit(
+                start=operationAction.startswith("FLOW_START_INTERVIEW_"),
+                key=limitName,
+                val={"_used": limitValue, "out_of": limitMax},
+            )
+            self.FLOW_WITH_LIMITS["limits"] = self.limits
 
     @property
     def safeName(self):
-        if(Operation.REDACT):
+        if Operation.REDACT:
             return self.nodeId
-        return self.name.replace('<', '&lt;').replace('>', '&gt;')
+        return self.name.replace("<", "&lt;").replace(">", "&gt;")

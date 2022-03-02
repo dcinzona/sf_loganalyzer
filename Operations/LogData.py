@@ -1,13 +1,14 @@
 from Operations.OperationStack import OperationStack
 
-class LogData():
+
+class LogData:
     logReversed = []
     lineNumber = 0
-    _stack:OperationStack = None
+    _stack: OperationStack = None
     _instance = None
 
     def getStack(self) -> OperationStack:
-        if(self._stack is None):
+        if self._stack is None:
             self._stack = OperationStack()
         return self._stack
 
@@ -17,4 +18,3 @@ class LogData():
             cls._instance._stack = OperationStack()
             # Put any initialization here.
         return cls._instance
-

@@ -49,22 +49,21 @@ class reader:
                 # will generate a logline object instance if this is a
                 # valid line (timestamp and |)
                 isValid, ll = LogLine.isValidLine(line.strip(), self.lineCount)
-                if(isValid):
+                if isValid:
                     # cluster tracking
-                    if(ll.lineSplit[1] == 'CODE_UNIT_STARTED'):
+                    if ll.lineSplit[1] == "CODE_UNIT_STARTED":
                         codeunitList.append(ll)
-                    elif(ll.lineSplit[1] == 'CODE_UNIT_FINISHED'):
+                    elif ll.lineSplit[1] == "CODE_UNIT_FINISHED":
                         lastCodeUnitLine = codeunitList.pop()
 
-                    if(self.processedInvalid is True):
+                    if self.processedInvalid is True:
                         # finished processing lines that did not have
                         # a timestamp and now processing the next valid line
                         # (so we need to reset the flag and process the last
                         #  valid line if it's a limits line)
                         self.processedInvalid = False
-                        if(self.lastValidLine.isLimitsLine()):
-                            self.limitUsageLines.append(
-                                self.lastValidLine.copy())
+                        if self.lastValidLine.isLimitsLine():
+                            self.limitUsageLines.append(self.lastValidLine.copy())
                             self.getNextCodeUnitFinished = True
                             pass
 
@@ -72,23 +71,26 @@ class reader:
                     self.loglines.append(line)
                     self.factory.generateOperation(ll)
 
-                    if(self.getNextCodeUnitFinished is True
-                       and ll.lineSplit[1] == 'CODE_UNIT_FINISHED'
-                       and len(self.limitUsageLines) > 0):
+                    if (
+                        self.getNextCodeUnitFinished is True
+                        and ll.lineSplit[1] == "CODE_UNIT_FINISHED"
+                        and len(self.limitUsageLines) > 0
+                    ):
 
                         self.getNextCodeUnitFinished = False
                         # this is the line range of the cluster
                         cluster = Cluster(
                             start=int(lastCodeUnitLine.lineNumber),
-                            end=int(ll.lineNumber))
+                            end=int(ll.lineNumber),
+                        )
                         cluster.name = ll.lineSplit[-1]
 
                         # add the limits lines to the cluster instance
                         for ln in self.limitUsageLines:
                             ns = ln.lineSplit[-2]
                             cluster.data[ns] = [
-                                x.strip() for x in ln.additionalLines
-                                if x.strip() != '']
+                                x.strip() for x in ln.additionalLines if x.strip() != ""
+                            ]
 
                         self.clusters.append(cluster)
                         self.limitUsageLines.clear()
@@ -97,8 +99,10 @@ class reader:
 
                 else:
                     # line didn't have a timestamp or pipe character
-                    if(self.lastValidLine is not None
-                       and self.lastValidLine.isLimitsLine()):
+                    if (
+                        self.lastValidLine is not None
+                        and self.lastValidLine.isLimitsLine()
+                    ):
                         # this is a limits line that has no timestamp
                         self.lastValidLine.addLine(line)
                         self.processedInvalid = True
@@ -108,70 +112,75 @@ class reader:
             # self.rootClusterStack.clusters = self.clusters
             # self.operations = []
             for idx, cluster in enumerate(self.clusters):
-                cluster.id = f'cluster{idx}'
+                cluster.id = f"cluster{idx}"
                 cluster.operations = [
-                    op.clone() for op in self.operations
+                    op.clone()
+                    for op in self.operations
                     # op for op in self.operations
-                    if op.lineNumber >= cluster.start
-                    and op.lineNumber < cluster.end]
+                    if op.lineNumber >= cluster.start and op.lineNumber < cluster.end
+                ]
 
                 for op in cluster.operations:
-                    if(op.lineNumber == cluster.start):
+                    if op.lineNumber == cluster.start:
                         op_ns = op.namespace
                         op.LIMIT_USAGE_FOR_NS = cluster.data.get(op_ns, [])
 
                         print(op_ns) if self.options.debug else None
-                        print(
-                            op.LIMIT_USAGE_FOR_NS[0]) if self.options.debug else None
-                    if(op.get('cluster', None) is None):
+                        print(op.LIMIT_USAGE_FOR_NS[0]) if self.options.debug else None
+                    if op.get("cluster", None) is None:
                         op.cluster = cluster
                         op.clusterId = op.cluster.id
-                        op._nodeId = f'{op.cluster.id}_{op.nodeId}'
+                        op._nodeId = f"{op.cluster.id}_{op.nodeId}"
 
                     print(
-                        f'\t[{op.lineNumber}] {op.name} | {op.clusterId}') if self.options.debug else None
+                        f"\t[{op.lineNumber}] {op.name} | {op.clusterId}"
+                    ) if self.options.debug else None
 
             for op in self.operations:
-                if(op.get('clusterId', None) is None):
+                if op.get("clusterId", None) is None:
                     for cluster in self.clusters:
-                        if(op.lineNumber >= cluster.start and op.lineNumber < cluster.end):
+                        if (
+                            op.lineNumber >= cluster.start
+                            and op.lineNumber < cluster.end
+                        ):
                             op.cluster = cluster
                             op.clusterId = op.cluster.id
-                            op._nodeId = f'{op.cluster.id}_{op.nodeId}'
+                            op._nodeId = f"{op.cluster.id}_{op.nodeId}"
                             print(
-                                f'\t[{op.lineNumber}] {op.name} | {op.clusterId} | {op.nodeId}')
+                                f"\t[{op.lineNumber}] {op.name} | {op.clusterId} | {op.nodeId}"
+                            )
                 else:
                     print(op.nodeId)
 
-            self.clusters = list(filter(lambda n: len(
-                n.operations) > 0, self.clusters))
+            self.clusters = list(filter(lambda n: len(n.operations) > 0, self.clusters))
 
-        if(self.options.debug):
+        if self.options.debug:
             openOps = 0
             opCountsByType = {}
             for idx, op in enumerate(self.operations):
-                if(op.finished is False):
+                if op.finished is False:
                     openOps += 1
                     print(
                         f'{idx} [{op.lineNumber}] "{op.name}" \
-                        <{op.eventId}> is not finished')
+                        <{op.eventId}> is not finished'
+                    )
                 clsName = op.__class__.__name__
-                if(isinstance(op, FlowOperation)):
+                if isinstance(op, FlowOperation):
                     clsName = op.eventType
                 opCountsByType.setdefault(clsName, 0)
                 opCountsByType[clsName] += 1
 
-            if(openOps > 0):
-                print(f'{openOps} operations are not finished')
+            if openOps > 0:
+                print(f"{openOps} operations are not finished")
 
-            print('\nCounts by type of operation:')
+            print("\nCounts by type of operation:")
             for k, v in opCountsByType.items():
-                print(f'{k}: {v}')
+                print(f"{k}: {v}")
                 # exit(1)
 
     def getLastOperationByAttribute(self, attr, value):
         for op in reversed(self.operations):
-            if(getattr(op, attr) == value):
+            if getattr(op, attr) == value:
                 return op
         return None
 

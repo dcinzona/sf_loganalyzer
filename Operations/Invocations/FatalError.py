@@ -2,7 +2,7 @@ from Operations.Operation import Operation
 
 
 class FatalErrorOp(Operation):
-    color = '#FF0101'
+    color = "#FF0101"
     # PREV=None
 
     def __init__(self, ll):
@@ -10,15 +10,15 @@ class FatalErrorOp(Operation):
         self.eventType = ll.lineSplit[1]  # 'FATAL_ERROR'
         self._name = ll.lineSplit[-1]
         self.logLine = ll
-        self.eventId = f'ERROR|{self.name}'
+        self.eventId = f"ERROR|{self.name}"
         self.finished = True
-        self.eventSubType = self.name.split(':')[0]
+        self.eventSubType = self.name.split(":")[0]
 
     @property
     def safeName(self):
-        if(self.name.startswith('System.LimitException:')):
+        if self.name.startswith("System.LimitException:"):
             return self.name
-        return self.name.split(':')[0]
+        return self.name.split(":")[0]
 
     @property
     def name(self):
