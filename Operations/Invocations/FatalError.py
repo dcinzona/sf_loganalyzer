@@ -2,7 +2,9 @@ from Operations.Operation import Operation
 
 
 class FatalErrorOp(Operation):
+    color = '#FF0101'
     # PREV=None
+
     def __init__(self, ll):
         super(FatalErrorOp, self).__init__(ll)
         self.eventType = ll.lineSplit[1]  # 'FATAL_ERROR'

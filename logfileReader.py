@@ -3,7 +3,7 @@ from Operations.Invocations.FlowOperation import FlowOperation
 from Operations.LogLine import LogLine
 from Operations.Cluster import Cluster
 from Operations.OpUtils import dynamicDict
-from Operations.OperationFactory import OperationFactory
+from Operations.OperationFactory import OperationFactory, OperationsList
 
 
 class reader:
@@ -11,6 +11,7 @@ class reader:
     lineCount: int = 0
     loglines: list[str] = []
     clusters: list[LogLine] = []
+    operations: OperationsList = []
 
     @property
     def logReversed(self):
@@ -67,9 +68,9 @@ class reader:
                             self.getNextCodeUnitFinished = True
                             pass
 
-                    self.lastValidLine = ll.copy()
+                    self.lastValidLine = ll  # .copy()
                     self.loglines.append(line)
-                    self.factory.createOrderedOperation(ll)
+                    self.factory.generateOperation(ll)
 
                     if(self.getNextCodeUnitFinished is True
                        and ll.lineSplit[1] == 'CODE_UNIT_FINISHED'

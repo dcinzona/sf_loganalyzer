@@ -1,23 +1,45 @@
 from pprint import pp
 from typing import Type
-from Operations.EntryOrExit import EntryOrExit
+import Operations.Invocations as OPS
 from Operations.Invocations.FatalError import FatalErrorOp
 from Operations.LogLine import LogLine
 from Operations.Operation import Operation
-from Operations.Invocations.CalloutOperation import CalloutOperation
-from Operations.Invocations.DMLOperation import DMLOperation
-from Operations.Invocations.ExecutionOperation import ExecutionOperation
-from Operations.Invocations.FlowOperation import FlowOperation
-from Operations.Invocations.MethodOperation import MethodOperation
-from Operations.Invocations.TriggerOperation import TriggerOperation
+
+
+class OperationsList(list['Operation']):
+    def __init__(self, *args, **kwargs):
+        super(OperationsList, self).__init__(*args, **kwargs)
+        print(f'{self.__class__.__name__} args: {args}')
+        print(f'{self.__class__.__name__} kwargs: {kwargs}')
+
+    def opsInRange(self, start: int, end: int) -> 'OperationsList':
+        return [op for op in self if op.lineNumber >= start and op.lineNumber <= end]
+
+    def opsByType(self, opType: Type[Operation]) -> 'OperationsList':
+        return [op for op in self if isinstance(op, opType)]
+
+    def opsInRangeByType(self, start: int, end: int, opType: Type[Operation]) -> 'OperationsList':
+        return [op for op in self.opsByType(opType=opType) if op.lineNumber >= start and op.lineNumber <= end]
+
+    def clusterOps(self, idx: int = None) -> 'OperationsList':
+        if(idx is None):
+            idx = len(self) - 1
+        return [op for op in self[:idx] if op.isClusterOp]
+
+    def getOperationClusterId(self, op: Operation) -> str:
+        idx = self.index(op)
+        clusterOps = self.clusterOps(idx=idx)
+        return clusterOps[-1].clusterId if len(clusterOps) > 0 \
+            else op.get('clusterId', '')
 
 
 class OperationFactory():
-    OPERATIONS: list[Operation] = []
+    """Manages the operations stack and instantiates the appropriate operation type"""
+    OPERATIONS: OperationsList
     hitException: bool = False
 
     def __init__(self, *args, **kwargs):
-        self.OPERATIONS = []
+        self.OPERATIONS = OperationsList([])
         self.hitException = False
         self.excluded_ops = kwargs.get(
             'exclude', ())
@@ -29,68 +51,7 @@ class OperationFactory():
     def _excluded(self, optype: str):
         return optype in self.excluded_ops
 
-    def createStackedOperation(self, logLine):
-        tokens: list[str] = logLine.line.split("|")
-        operation = None
-        if(self.hitException and self.stop_on_exception):
-            return None
-        if(tokens and len(tokens) > 1):
-            opType = Operation.getType(tokens)
-            if(tokens[1].startswith("METHOD_") and self._shouldProcess(opType)):
-                if(len(tokens[-2]) > 0):
-                    # Second to last token is the method line number
-                    operation = MethodOperation(logLine)
-                    pass
-            elif(tokens[1].startswith("DML_") and self._shouldProcess(opType)):
-                pass
-                # operation = DMLOperation(logLine);
-            elif(tokens[1].startswith("EXECUTION_") and self._shouldProcess(opType)):
-                pass
-                # operation = ExecutionOperation(tokens, logLine.lineNumber);
-            elif(tokens[1].startswith("CALLOUT") and self._shouldProcess(opType)):
-                operation = CalloutOperation(logLine)
-            elif(tokens[1].startswith("FLOW_") and self._shouldProcess(opType)):
-                if(tokens[1] in EntryOrExit.ALL):
-                    operation = FlowOperation(logLine)
-            elif(tokens[1].startswith("CODE_UNIT_") and self._shouldProcess(opType)):
-                # Check if this is a trigger
-                if(opType == 'triggers'):
-                    operation = TriggerOperation(logLine)
-                elif(opType == 'flows'):
-                    operation = FlowOperation(logLine)
-                elif(opType == 'workflows'):
-                    pass
-                elif(opType == 'validations'):
-                    pass
-                elif(opType == 'duplicateDetector'):
-                    pass
-                elif(opType == 'apex'):
-                    operation = MethodOperation(logLine)
-                    pass
-            elif(tokens[1] in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
-                self.hitException = True
-                operation = FatalErrorOp(logLine)
-                if(self.findInStack(operation) is None):
-                    lastOp = self.getOpenParentOperation(operation)
-                    if(lastOp is not None):
-                        operation.parent = lastOp if operation.get(
-                            'parent', None) is None else operation.parent
-                return operation
-
-        # The operation here is based on the log line, so it may already be in the stack
-        if(operation is not None):
-            if(operation.get('parent', None) is None and operation.isEntry()):
-                operation.parent = self.getOpenParentOperation(operation)
-            operation.tokens = tokens
-            if(isinstance(operation, FlowOperation) and operation.eventType == 'FLOW_WRAPPER'):
-                operation = None
-                return None
-            op = self.findInStack(operation)
-            if(op is not None):
-                op.update(operation.__dict__)
-        return operation
-
-    def createOrderedOperation(self, logLine: LogLine):
+    def generateOperation(self, logLine: LogLine) -> Operation:
         # only push operations onto the stack on operation entry
         # flows need to be handled differently (flow name isn't on the same line as the entry event)
         tokens: list[str] = logLine.lineSplit
@@ -106,21 +67,21 @@ class OperationFactory():
                     isCustomMethod = tokens[-1].split('.')[0] not in [
                         'System', 'Database', 'UserInfo']
                     if(isCustomMethod):
-                        op = MethodOperation(logLine)
-                        op = MethodOperation.METHODSTACK.pop()
+                        op = OPS.MethodOperation(logLine)
+                        op = OPS.MethodOperation.METHODSTACK.pop()
                         op.finished = True
             elif(tokens[1].startswith("DML_")):
-                op = DMLOperation(logLine)
+                op = OPS.DMLOperation(logLine)
             elif(tokens[1].startswith("EXECUTION_")):
-                op = ExecutionOperation(logLine)
+                op = OPS.ExecutionOperation(logLine)
             elif(tokens[1].startswith("CALLOUT")):
-                op = CalloutOperation(logLine)
+                op = OPS.CalloutOperation(logLine)
             elif(tokens[1].startswith("FLOW_")):
                 if(tokens[1] in ['FLOW_CREATE_INTERVIEW_BEGIN', 'FLOW_CREATE_INTERVIEW_END']):
-                    op = FlowOperation(logLine)
+                    op = OPS.FlowOperation(logLine)
                     op.finished = False
                     if(op.operationAction == 'FLOW_CREATE_INTERVIEW_END'):
-                        op = FlowOperation.FLOWSTACK.pop()
+                        op = OPS.FlowOperation.FLOWSTACK.pop()
                         op.finished = True
             elif(tokens[1].startswith("CODE_UNIT_STARTED")):
                 # Check if this is a trigger
@@ -129,11 +90,11 @@ class OperationFactory():
                     # this is a generic line that specifies that triggers are running (probably to group them all together)
                     return None
                 elif(opType == 'trigger'):
-                    op = TriggerOperation(logLine)
-                    op = TriggerOperation.TRIGGERSTACK.pop()
+                    op = OPS.TriggerOperation(logLine)
+                    op = OPS.TriggerOperation.TRIGGERSTACK.pop()
                     op.finished = True
                 elif(opType == 'flow'):
-                    op = FlowOperation(logLine)
+                    op = OPS.FlowOperation(logLine)
                     op.finished = False
                 elif(opType == 'workflow'):
                     pass
@@ -144,8 +105,8 @@ class OperationFactory():
                 elif(opType == 'system'):
                     pass
                 elif(opType == 'apex'):
-                    op = MethodOperation(logLine)
-                    op = MethodOperation.METHODSTACK.pop()
+                    op = OPS.MethodOperation(logLine)
+                    op = OPS.MethodOperation.METHODSTACK.pop()
                     op.finished = True
                     pass
             elif(tokens[1] in ['FATAL_ERROR', 'EXCEPTION_THROWN']):
@@ -182,7 +143,7 @@ class OperationFactory():
             if(stackOp.eventId == op.eventId):
                 stackOp.update(op.__dict__)
                 return op
-            elif(isinstance(op, FlowOperation) is False):
+            elif(isinstance(op, OPS.FlowOperation) is False):
                 try:
                     if(stackOp.name == op.name and stackOp.eventType == op.eventType and stackOp.eventSubType == op.eventSubType):
                         stackOp.update(op.__dict__)

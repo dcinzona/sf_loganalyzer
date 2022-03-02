@@ -5,6 +5,7 @@ from Operations.Operation import Operation
 class TriggerOperation(Operation):
 
     TRIGGERSTACK: list[dict] = []
+    color = '#800180'
 
     def __init__(self, ll):
         super(TriggerOperation, self).__init__(ll)

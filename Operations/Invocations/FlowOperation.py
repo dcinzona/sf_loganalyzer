@@ -1,7 +1,5 @@
-import json
 from pprint import pp
 from Operations.LogLine import LogLine
-from Operations.OpUtils import dynamicDict
 from Operations.Operation import LimitData, Operation
 
 
@@ -11,6 +9,11 @@ class FlowOperation(Operation):
     FLOW_WITH_LIMITS = None
     CREATE_INTERVIEW_TYPE: str = None
     CURRENT_FLOW = None
+
+    @property
+    def color(self):
+        color = '#033E3E' if self.eventType == 'FLOW' else '#418855'  # process builder
+        return color
 
     # have to check the previous line to determine if this is a flow or a process builder
     # seems like process builders all have the last element in the previous line starting with 301r
@@ -23,7 +26,7 @@ class FlowOperation(Operation):
         if(len(tokens[-1]) == 0):
             tokens.pop()
             self.eventType = 'FLOW'
-        #tokens.pop() if tokens[-1] == '' else None
+        # tokens.pop() if tokens[-1] == '' else None
         if(tokens[1] == 'CODE_UNIT_STARTED'):
             self.codeUnitStarted(tokens)
         elif(tokens[1] == "FLOW_CREATE_INTERVIEW_BEGIN"):
@@ -46,8 +49,8 @@ class FlowOperation(Operation):
             else:
                 pp(FlowOperation.FLOWSTACK)
                 raise Exception(f'{tokens[2]} not found in stack')
-            #FlowOperation.FLOW_WITH_LIMITS = self
-            #FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
+            # FlowOperation.FLOW_WITH_LIMITS = self
+            # FlowOperation.LAST_OPERATION = FlowOperation.FLOW_WITH_LIMITS
 
         elif(tokens[1].endswith("_LIMIT_USAGE")):
             self.update(FlowOperation.FLOWSTACK[-1])
@@ -69,10 +72,10 @@ class FlowOperation(Operation):
     def getFlowFromStack(self, eventId: str):
         for f in FlowOperation.FLOWSTACK[::-1]:
             if(f.eventId == eventId):
-                #print(f'1: {f.eventId} == {eventId}')
+                # print(f'1: {f.eventId} == {eventId}')
                 return f  # , FlowOperation.FLOWSTACK.index(f)
             else:
-                #print(f'0: {f.eventId} != {eventId}')
+                # print(f'0: {f.eventId} != {eventId}')
                 # f.print(self)
                 pass
         pp(FlowOperation.FLOWSTACK)

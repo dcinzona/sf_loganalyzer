@@ -14,6 +14,12 @@ class kLimit:
 
 
 class LimitData(dict):
+    """Used for flow limit tracking - still under development
+
+    Args:
+        dict (_type_): TBD
+    """
+
     def __init__(self, initializer: dict = None):
         if(initializer is not None):
             super().__init__(initializer)
@@ -31,6 +37,14 @@ class LimitData(dict):
 
 
 class Operation(dynamicDict):
+    """The core base class for all operations.  Extensable by subclasses.
+
+    Args:
+        dynamicDict (_type_): Usually initiated with a LogLine object, but this may change
+
+    Returns:
+        _type_: Subclass of dynamicDict
+    """
     # instance properties
     name: str = ''
     lineNumber: int = 0
@@ -45,6 +59,8 @@ class Operation(dynamicDict):
     LIMIT_USAGE_FOR_NS = []
     PREV_OPERATION: 'Operation' = None
     NEXT_OPERATION: 'Operation' = None
+
+    color = '#FFFFFF'
 
     # static properties
     REDACT: bool = False
@@ -75,7 +91,8 @@ class Operation(dynamicDict):
 
     def __str__(self):
         obj: dict = {}
-        skipProps = ['parent', 'children', 'lineNumber', 'line', 'lineSplit']
+        skipProps = ['parent', 'children', 'lineNumber',
+                     'line', 'lineSplit', 'cluster']
         # from pprint import pformat
         for k, v in self.items():
             if(k not in skipProps):
@@ -89,16 +106,25 @@ class Operation(dynamicDict):
                     obj[k] = {
                         v.__class__.__name__: f'[{v.lineNumber}] {v.eventId}'}
                 else:
-                    obj[k] = v
+                    obj[k] = v  # type(v)
 
         # return pformat(vars(obj), indent=4, width=1)
         return f'{self.__class__.__name__}({pformat(obj, indent=4, width=1)})'
 
     @property
     def safeName(self):
+        """Returns the operation name stripped of excess data and unsafe rendering characters
+           Also checks for the redaction flag and returns a redacted unique name of the operation
+
+
+        Returns:
+            _type_: _description_
+        """
         if(Operation.REDACT):
             return self.nodeId
         escStr = self.name.replace('<', '&lt;').replace('>', '&gt;')
+        # some exceptions will have too much detail after the first ':' so we strip after the first ':'
+        # invoked actions can start with apex:// so we want to keep those
         return escStr.split(':')[0] if ':' in escStr \
             and not escStr.startswith('apex:') \
             else escStr

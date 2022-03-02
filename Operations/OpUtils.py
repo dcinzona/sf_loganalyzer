@@ -3,6 +3,12 @@ import base64
 
 
 class dynamicDict(dict):
+    """Core class for creating operations.
+
+    Args:
+        dict (_type_): _description_
+    """
+
     def __init__(self, *args, **kwargs):
         super(dynamicDict, self).__init__(*args, **kwargs)
         self.__dict__ = self

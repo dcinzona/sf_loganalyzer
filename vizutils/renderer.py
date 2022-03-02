@@ -1,10 +1,10 @@
 
 from pprint import pformat
-from tokenize import group
-from Operations.Invocations.FatalError import FatalErrorOp
 from Operations.Cluster import Cluster
 from Operations.OpUtils import dynamicDict
 from Operations.Operation import Operation
+from Operations.OperationFactory import OperationsList
+from vizutils.utils.RenderUtils import Node, nodeArgs
 import graphviz
 
 
@@ -12,26 +12,76 @@ class renderer():
 
     operations: list[Operation] = []
 
+    @property
+    def graphLabelText(self) -> str:
+        return f'Log file visualization for {self.filename}'
+
+    @property
+    def graphAttrs(self):
+        return {
+            'label': f'<<FONT POINT-SIZE="28">{self.graphLabelText}</FONT>>',
+            'tooltip': '',
+            'labeljust': 'l',
+            'outputorder': 'nodesfirst',
+            # 'margin': '24.0',
+            'rank': 'same',
+            # 'style': "invis",
+            'ordering': "out",
+            'rankdir': self.options.rankdir,
+            'fontname': "Salesforce,helveticaneue-light,Helvetica,Arial,sans-serif",
+            'labelloc': 't',
+            'center': 'false',
+            'pad': '0.5',
+            'compound': 'true',
+        }
+
+    @property
+    def subgraphAttrs(self) -> dict:
+        attrs = dict(self.graphAttrs)
+        attrs.pop('label', None)
+        attrs.pop('labelloc', None)
+        attrs.pop('labeljust', None)
+        attrs.pop('tooltip', None)
+        attrs['center'] = 'true'
+        # attrs['style'] = 'invis'
+        attrs['rank'] = 'same'
+        attrs['nojustify'] = 'true'
+        return attrs
+
     def __init__(self, *args, **kwargs) -> None:
         self.options = dynamicDict(kwargs)
         self.nodestyle = 'filled, rounded'
         fileformat = self.options.format
         self.filename = self.options.logfile
-        self.g = graphviz.Digraph(
-            f'{self.filename}',
-            graph_attr={
-                'label': f'Log file visualization for {self.filename}', 'outputorder': 'nodesfirst'},
-            format=fileformat)
+        self.g = graphviz.Digraph('SFLogGraph',
+                                  filename=f'{self.filename}.gv',
+                                  comment=self.graphLabelText,
+                                  graph_attr=self.graphAttrs,
+                                  format=fileformat)
         self.useloops = self.options.useloops  # kwargs.get('useloops', False)
-        self.stackProcessMap = {}
         self.g.strict = self.options.strict
         self.g.engine = self.options.engine
-        self.g.graph_attr['rankdir'] = self.options.rankdir
-        self.g.graph_attr['fontname'] = "helveticaneue-light,Helvetica,Arial,sans-serif"
         self.g.attr(
             'node', fontname='helveticaneue-light,Helvetica,Arial,sans-serif')
         self.g.attr(
             'edge', fontname='helveticaneue-light,Helvetica,Arial,sans-serif')
+
+    def _addDebugToGraph(self, graph: graphviz.Digraph, **kwargs):
+        if(graph is not None and self.options.debug):
+            # with graph.subgraph(name=f'cluster_DEBUG_{graph.name}', graph_attr=self.subgraphAttrs) as g:
+            #     g.node(f'debug_{graph.name}', label=pformat(graph.graph_attr, indent=4),
+            #            shape='plaintext', style='filled', fontsize='16')\
+            #         if str(graph.graph_attr) != '{}' else None
+            # graph.edge(f'debug_{graph.name}', f'{graph.name}', taillabel=pformat(
+            #     graph.graph_attr, indent=4), labeljust='l', fontsize='16')
+            txt = f"\n{graph.name} attrs: {pformat(graph.graph_attr, indent=4, depth=2)}"
+            print(txt)
+            # self.g.node(f'debug_{graph.name}', label=txt,
+            #             shape='box', style='filled,rounded')
+
+    def _clearlabels(self, g: graphviz.Digraph):
+        g.attr(label='')
+        g.attr(tooltip='')
 
     def processClusters(self, clusterOps: list[Cluster]):
         self.clusters = clusterOps
@@ -44,52 +94,35 @@ class renderer():
         pass
 
     def _processCluster(self, cluster: Cluster):
-        with self.g.subgraph(name=f'cluster_{cluster.name}',
-                             graph_attr={
-                                 'label': f'{cluster.name}',
-                                 'tooltip': f'{cluster.name}',
-                                 'style': "invis",
-                                 'ordering': "out",
-                                 'margin': '24.0',
-                                 'rankdir': self.options.rankdir,
-                                 'labeljust': 'c'}) as g:
-
+        with self._subgraph(self.g, f'cluster_{cluster.name}', graph_attr=self.subgraphAttrs) as g:
             for idx, op in enumerate(cluster.operations):
                 self._validateOperations(op, idx)
                 self._loadNodesAndEdgesIntoGraph(g, op, idx, None)
 
-    def processStack(self, sortedOperations: list):
-        self.operations = sortedOperations
+    def processStack(self, opsList: OperationsList):
+        self.operations = opsList
+        self.nodeUtils = Node(self.operations, self.options)
 
         if(len(self.operations) == 0):
             raise Exception("No operations found in the log file")
 
         self._checkIdx()
 
-        with self.g.subgraph(name='cluster_Log', graph_attr={'labeljust': 'c',
-                                                             'outputorder': 'nodesfirst',
-                                                             # 'outputorder': 'edgesfirst',
-                                                             'margin': '24.0',
-                                                             'rank': 'min',
-                                                             'style': "invis",
-                                                             'ordering': "out"}) as g:
-            if(self.options.debug):
-                print(g.graph_attr.__str__())
-                with self.g.subgraph(name='cluster_debug', graph_attr={
-                        'labeljust': 'c', 'rank': 'min', 'style': "invis"}) as g2:
-                    g2.node('debug', label=pformat(g.graph_attr, indent=4),
-                            shape='box', style='filled', fontsize='16')
+        self._addDebugToGraph(self.g, graph_attr=self.subgraphAttrs)
 
+        with self.g.subgraph(name='cluster_Log', graph_attr=self.subgraphAttrs) as g:
+            self._addDebugToGraph(g, graph_attr=self.subgraphAttrs)
+            self._clearlabels(g)
             g.node('start', label='START', shape='invhouse', style='filled',
-                   fillcolor=self.lighten('#00FF00', .4), fontsize='16')
+                   fillcolor=self.nodeUtils.lighten('#00FF00', .4), fontsize='16')
 
-            with g.subgraph(name='cluster_STACK', graph_attr={
-                    'labeljust': 'c', 'rank': 'same', 'style': "invis", 'ordering': 'out'}) as dg:
-
+            with g.subgraph(name='cluster_STACK', graph_attr=self.subgraphAttrs) as dg:
+                # self._addDebugToGraph(g, graph_attr=self.subgraphAttrs)
+                self._clearlabels(dg)
                 self._buildGraph(dg)
 
             g.node('end', label='END', shape='invhouse', style='filled',
-                   fillcolor=self.lighten('#00FF00', .4), fontsize='16')
+                   fillcolor=self.nodeUtils.lighten('#00FF00', .4), fontsize='16')
 
     def _buildGraph(self, g: graphviz.Digraph) -> None:
         clusterIdx = 0
@@ -97,148 +130,29 @@ class renderer():
         for idx, op in enumerate(self.operations):
             self._validateOperations(op, idx)
             try:
-                if(op.isClusterOp):
-                    clusterIdx += 1
-                    graph = graphviz.Digraph(
-                        f'cluster_{clusterIdx}')
-                    graph.graph_attr['label'] = f'{op.safeName}'
-                    graph.graph_attr[
-                        'tooltip'] = f'{op.safeName}\n{self._getLimitDataString(op)}'
-                    graph.graph_attr['style'] = 'invis'
-                    graph.graph_attr['rank'] = 'same'
-                    # subclusters.append(graph)
-
                 self._loadNodesAndEdgesIntoGraph(
                     subclusters[-1], op, idx, clusterIdx)
-
             except Exception as e:
                 print(
                     f"Error processing operation {op}")
                 raise e
-        for graph in subclusters:
-            # g.subgraph(graph)
-            pass
-
-    clusterGroup = 'root'
 
     def _loadNodesAndEdgesIntoGraph(self, g: graphviz.Digraph, op: Operation, idx: int, clusterIdx: int = 0) -> None:
-
-        if(op.isClusterOp and self.options.debug):
-            print(f'[{op.lineNumber}] {op.LIMIT_USAGE_FOR_NS[0]}')
-            print(op.clusterId)
-            self.clusterGroup = op.clusterId
-            exit()
-            pass
-
-        opName = op.safeName
-        # f'{self._getOpNodeId(op)}{clusterIdx}' if op.isClusterOp == False else f'{self._getOpNodeId(op)}{clusterIdx-1}'
-        nodeId = self._getOpNodeId(op)
-        parentNodeId = self._getOpNodeId(
-            op.PREV_OPERATION) if op.PREV_OPERATION is not None else 'start'
-        parentOpName = op.PREV_OPERATION.safeName if op.PREV_OPERATION is not None else 'start'
-        nodeTT = self._getNodeTooltip(op)
-
-        if(self.options.redact):
-            if(isinstance(op, FatalErrorOp)):
-                nodeTT += f'\n   {op.safeName}'
-
-            else:
-                opName = f'UID: {op.nodeId}'
-                nodeTT += f'\n   {op.nodeId}'
-                parentOpName = parentNodeId
-
-        else:
-            nodeTT += f'\n   Operation: {op.safeName}'
-
-        nodeTT += self._getLimitDataString(op)
-
-        # create and style the edges (arrows to each node)
-        lmtstr: str = None
-        if(op.PREV_OPERATION is not None and op.PREV_OPERATION.isClusterOp and not self.options.strict):
-            lmtstr = f'\nLimits Usage Data:\nNamespace: {op.PREV_OPERATION.namespace}\n  '
-            lmtstr += '\n  '.join(op.PREV_OPERATION.LIMIT_USAGE_FOR_NS)
-
-        edgetooltip = f'''Previous Node:
-                            LogLine: [{op.PREV_OPERATION.lineNumber}]
-                            Type: {op.PREV_OPERATION.eventType}
-                            Name: {parentOpName}''' if op.PREV_OPERATION is not None else ''
-
-        edgetooltip += f'''\nNext Node:
-                            {nodeTT}\n'''
-
-        edgetooltip += lmtstr if lmtstr is not None else ''
-        edgetooltip = edgetooltip.replace(
-            '                                ', '')
-
+        nodeargs = self.nodeUtils.BuildNode(op=op)
+        g.node(nodeargs.name, nodeargs.label, **nodeargs)
+        edgeargs = self.nodeUtils.BuildEdge(op=op)
         isLastOp = op == self.operations[-1]
-        edgeLabelColor = '#000000' if lmtstr is None else '#cc2222'
-        edgePenWidth = '1.0' if lmtstr is None else '3.0'
-        tail = parentNodeId if idx > 0 else 'start'
-        head = nodeId
-        nodeColor = self._opColor(
-            op.PREV_OPERATION.eventType) if idx > 0 and not isLastOp else self._opColor(op.eventType)
-
-        tailurlId = f'lognode{parentNodeId}'
-        headurlId = f'lognode{nodeId}'
-        self._addEdge(g,
-                      tail,
-                      head,
-                      f'{idx + 1}',
-                      #   taillabel=taillabel,
-                      #   headlabel=headlabel,
-                      color=nodeColor,
-                      tooltip=edgetooltip,
-                      labeltooltip=edgetooltip,
-                      tailtooltip=edgetooltip,
-                      headtooltip=edgetooltip,
-                      edgetooltip=edgetooltip,
-                      fontcolor=edgeLabelColor,
-                      # tail links to head, head links to tail
-                      tailURL=f'#{headurlId}',
-                      headURL=f'#{tailurlId}',
-                      penwidth=edgePenWidth,
-                      constraint='true')
-
         if(isLastOp):
-            g.edge(nodeId, 'end', label=f'{len(self.operations) + 1}', color=self._opColor(
-                op.eventType), tooltip=edgetooltip, labeltooltip=edgetooltip, penwidth=edgePenWidth, constraint='true')
-
-        # create and style the nodes
-        nodepenwidth = '3.0' if len(op.LIMIT_USAGE_FOR_NS) > 0 else '1.0'
-
-        g.node(nodeId, label=f'<{opName}<BR ALIGN="LEFT"/><font POINT-SIZE="8"><b><sub>{op.eventType}</sub></b></font>>',
-               shape='box',
-               color=self._eventTypeColor(op.eventType),
-               fillcolor=self._opFillColor(op.eventType),
-               style=self.nodestyle,
-               tooltip=self._getNodeTooltip(op),
-               id=headurlId,
-               penwidth=nodepenwidth,
-               group=self.clusterGroup
-               )
-
-    def _getNodeTooltip(self, op: Operation) -> str:
-        tt = f'Line [{op.lineNumber}]\n   {op.eventType}'
-
-        if(self.options.redact):
-            tt += f'\n   {op.safeName}' if isinstance(
-                op, FatalErrorOp) else f'\n   Operation Unique ID: ({op.idx})'
+            self._addEdge(g, edgeargs)
+            g.edge(edgeargs.head, 'end', str(
+                len(self.operations) + 1), **edgeargs)
+        elif(idx == 0):
+            g.edge('start', edgeargs.head, str(idx + 1), **edgeargs)
         else:
-            tt += f'\n   Operation: {op.safeName}'
+            self._addEdge(g, edgeargs)
 
-        return tt
-
-    def _getLimitDataString(self, op: Operation) -> str:
-        if(len(op.LIMIT_USAGE_FOR_NS) == 0):
-            return ''
-
-        lmtstr = '\nLimits Usage Data:\n  '
-        lmtstr += '\n  '.join(op.LIMIT_USAGE_FOR_NS)
-
-        return lmtstr
-
-    def _addEdge(self, g: graphviz.Digraph, tail: str, head: str, label: str, _attributes=None, **kwargs):
-        g.edge(tail, head, label, **kwargs)
+    def _addEdge(self, g: graphviz.Digraph, args: nodeArgs) -> None:
+        g.edge(args.tail, args.head, args.label, **args)
 
     def _validateOperations(self, op: Operation, idx: int) -> None:
         if(op.PREV_OPERATION is None and idx > 0):
@@ -255,53 +169,6 @@ class renderer():
         if(op.NEXT_OPERATION is not None and op.eventId == op.NEXT_OPERATION.eventId):
             raise(
                 Exception(f'Operation [{idx}] {op.name} is a duplicate of [{op.NEXT_OPERATION.name}]'))
-
-    def _getOpNodeId(self, op: Operation) -> str:
-        nodeId = op.nodeId
-        if(self.useloops is False):
-            # make each node operation unique to prevent looping
-            nodeId = f'{op.idx}{op.nodeId}'
-        return nodeId
-
-    def _opColor(self, evtType: str) -> str:
-        return self._eventTypeColor(evtType)
-
-    def _eventTypeColor(self, eventType) -> str:
-        color = '#888888'
-        if(eventType == 'APEX'):
-            # add to apex cluster
-            color = '#0101FF'
-            pass
-        elif(eventType == 'TRIGGER'):
-            # add to trigger cluster
-            color = '#800180'
-            pass
-        elif(eventType == 'FLOW'):
-            # add to flow cluster
-            color = '#033E3E'
-            pass
-        elif(any(x in eventType for x in ['ERROR', 'EXCEPTION'])):
-            color = '#FF0101'
-            pass
-        elif(eventType == 'PROCESS BUILDER'):
-            # add to flow cluster
-            color = '#418855'
-            pass
-        return color.lower()
-
-    def _opFillColor(self, eventType: str) -> str:
-        return self.lighten(self._eventTypeColor(eventType), .7)
-
-    def lighten(self, hex, amount):
-        """ Lighten an RGB color by an amount (between 0 and 1),
-
-        e.g. lighten('#4290e5', .5) = #C1FFFF
-        """
-        hex = hex.replace('#', '')
-        red = min(255, int(hex[0:2], 16) + 255 * amount)
-        green = min(255, int(hex[2:4], 16) + 255 * amount)
-        blue = min(255, int(hex[4:6], 16) + 255 * amount)
-        return "#%X%X%X" % (int(red), int(green), int(blue))
 
     def _checkIdx(self) -> None:
         if(len(self.operations) == 0):
