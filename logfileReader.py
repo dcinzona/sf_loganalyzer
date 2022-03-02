@@ -1,24 +1,27 @@
 import os
-from Operations.Invocations.FlowOperation import FlowOperation
-from Operations.LogLine import LogLine
-from Operations.Cluster import Cluster
-from Operations.OpUtils import dynamicDict
-from Operations.OperationFactory import OperationFactory, OperationsList
+
+import Operations.Invocations as Invocations
+
+# from Operations.Invocations.FlowOperation import FlowOperation
+import Operations.LogLine as LL
+import Operations.Cluster as Cluster
+import Operations.OpUtils as OpUtils
+import Operations.OperationFactory as OpFactory
 
 
 class reader:
 
     lineCount: int = 0
     loglines: list[str] = []
-    clusters: list[LogLine] = []
-    operations: OperationsList = []
+    clusters: list[LL.LogLine] = []
+    operations: OpFactory.OperationsList = []
 
     @property
     def logReversed(self):
         return list(reversed(self.loglines))
 
     def __init__(self, **kwargs):
-        self.options = dynamicDict(kwargs)
+        self.options = OpUtils.dynamicDict(kwargs)
         self.logfile = self.options.logfile
         self.loglines = []
         self.lineCount = 0
@@ -26,13 +29,13 @@ class reader:
         self.logpath = os.path.abspath(self.logfile)
         self.filename = os.path.basename(self.logpath)
         self.inputfileDir = os.path.dirname(os.path.abspath(self.logpath))
-        self.factory = OperationFactory(**self.options)
+        self.factory = OpFactory.OperationFactory(**self.options)
         self.operations = self.factory.OPERATIONS
         self.limitUsageLines = []
         self.clusters = []
 
     def read(self):
-        codeunitList: list[LogLine] = []
+        codeunitList: list[LL.LogLine] = []
         with open(self.logpath) as infile:
             # for tracking actual log lines in the file vs operations
             self.lineCount = 0
@@ -48,7 +51,7 @@ class reader:
                 self.lineCount += 1  # we read a line
                 # will generate a logline object instance if this is a
                 # valid line (timestamp and |)
-                isValid, ll = LogLine.isValidLine(line.strip(), self.lineCount)
+                isValid, ll = LL.LogLine.isValidLine(line.strip(), self.lineCount)
                 if isValid:
                     # cluster tracking
                     if ll.lineSplit[1] == "CODE_UNIT_STARTED":
@@ -79,7 +82,7 @@ class reader:
 
                         self.getNextCodeUnitFinished = False
                         # this is the line range of the cluster
-                        cluster = Cluster(
+                        cluster = Cluster.Cluster(
                             start=int(lastCodeUnitLine.lineNumber),
                             end=int(ll.lineNumber),
                         )
@@ -150,7 +153,7 @@ class reader:
                                 f"\t[{op.lineNumber}] {op.name} | {op.clusterId} | {op.nodeId}"
                             )
                 else:
-                    print(op.nodeId)
+                    print(op.nodeId) if self.options.debug else None
 
             self.clusters = list(filter(lambda n: len(n.operations) > 0, self.clusters))
 
@@ -165,7 +168,7 @@ class reader:
                         <{op.eventId}> is not finished'
                     )
                 clsName = op.__class__.__name__
-                if isinstance(op, FlowOperation):
+                if isinstance(op, Invocations.FlowOperation):
                     clsName = op.eventType
                 opCountsByType.setdefault(clsName, 0)
                 opCountsByType[clsName] += 1

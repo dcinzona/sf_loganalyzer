@@ -1,4 +1,4 @@
-from pprint import pp
+import pprint
 import base64
 
 
@@ -26,7 +26,7 @@ class dynamicDict(dict):
             cp.pop("tokens")
         if "lineSplit" in cp:
             cp.pop("lineSplit")
-        pp(cp)
+        pprint.pp(cp)
 
     @property
     def nodeId(self):

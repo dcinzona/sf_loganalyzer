@@ -1,4 +1,4 @@
-from Operations.Operation import Operation
+import Operations.Operation as OPCLS
 
 
 class ClusterStack:
@@ -27,7 +27,7 @@ class Cluster(object):
     start: int
     end: int
     data: dict
-    operations: list[Operation]
+    operations: list[OPCLS.Operation]
 
     def __init__(self, start: int = 0, end: int = 0, data: dict = {}):
         self.start = start
@@ -36,7 +36,7 @@ class Cluster(object):
         self.data = data.copy()
         self.operations = []
 
-    def addOperation(self, operation: "Operation") -> None:
+    def addOperation(self, operation: "OPCLS.Operation") -> None:
         if operation.lineNumber >= self.start and operation.lineNumber < self.end:
             self.data[operation.namespace].append(operation)
 

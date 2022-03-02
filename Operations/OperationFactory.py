@@ -9,8 +9,8 @@ from Operations.Operation import Operation
 class OperationsList(list["Operation"]):
     def __init__(self, *args, **kwargs):
         super(OperationsList, self).__init__(*args, **kwargs)
-        print(f"{self.__class__.__name__} args: {args}")
-        print(f"{self.__class__.__name__} kwargs: {kwargs}")
+        # print(f"{self.__class__.__name__} args: {args}")
+        # print(f"{self.__class__.__name__} kwargs: {kwargs}")
 
     def opsInRange(self, start: int, end: int) -> "OperationsList":
         return [op for op in self if op.lineNumber >= start and op.lineNumber <= end]

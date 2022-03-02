@@ -6,8 +6,8 @@ import sys
 import traceback
 import click
 
-from logfileReader import reader
-from vizutils.renderer import renderer
+import logfileReader
+import vizutils.renderer as renderUtil
 
 
 class logviz:
@@ -18,9 +18,9 @@ class logviz:
         pass
 
     def run(self, *args, **kwargs):
-        self.reader = reader(**kwargs)
+        self.reader = logfileReader.reader(**kwargs)
         self.reader.read()
-        self.renderer = renderer(*args, **kwargs)
+        self.renderer = renderUtil.renderer(*args, **kwargs)
         self.renderer.processStack(self.reader.operations)
         print(f"\n{len(self.reader.operations)} reader operations processed")
         print("...Loading file in default system viewer")
