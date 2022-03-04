@@ -20,8 +20,8 @@ def init_logger(debug=False):
     """Initialize the logger"""
 
     logger = logging.getLogger(__name__.split(".")[0])
-    for handler in logger.handlers:  # pragma: no cover
-        logger.removeHandler(handler)
+    # for handler in logger.handlers:  # pragma: no cover
+    #     logger.removeHandler(handler)
 
     if os.name == "nt" and "colorama" in sys.modules:  # pragma: no cover
         colorama.init()

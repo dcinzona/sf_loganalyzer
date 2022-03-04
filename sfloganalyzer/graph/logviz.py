@@ -23,9 +23,15 @@ class logviz:
         self.renderer = Renderer(*args, **kwargs)
         self.renderer.processStack(self.reader.operations)
         print(f"\n{len(self.reader.operations)} reader operations processed")
-        print("...Loading file in default system viewer")
-        if kwargs.get("no-show", False) is False:
+        if not kwargs.get("no_show", False):
+            print("...Loading file in default system viewer")
             self.renderer.g.view()
+        else:
+            print("...Skipping system viewer")
+            print("Graphviz file saved to: " + self.renderer.g.filepath)
+            print(
+                f"{str(kwargs.get('format')).upper()} file saved to: {self.renderer.g.filepath}.{str(kwargs.get('format'))}"
+            )
 
 
 @click.command(name="render", help="Visualize log data.")
@@ -107,8 +113,8 @@ class logviz:
 def run(*args, **kwargs):
     if kwargs.get("debug", False):
         pass
-    runner = logviz()
     try:
+        runner = logviz()
         runner.run(*args, **kwargs)
     except Exception as e:
         print(f"\n== Error ==\n{e}\n")
