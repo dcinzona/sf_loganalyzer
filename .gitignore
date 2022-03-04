@@ -48,16 +48,12 @@ package-lock.json
 # Byte-compiled / optimized / DLL files
 **__pycache__/**
 *.py[cod]
+.pytest_cache/
+__pycache__/
 
-# Ignore pacakge gen
-snowfakery_aie.zip
-tmp/
 temp/
-org_schema.db
-datasets/mapping.yml
-Swagger/Generator/GeneratedApex/
-GeneratedApex.zip
-test.json
+output/
+build/
 
 *.gv
 *.dot
@@ -65,3 +61,5 @@ test.json
 *.png
 *.jpg
 *.pdf
+
+!examples/**

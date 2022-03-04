@@ -4,29 +4,7 @@
 #
 #    pip-compile ./requirements/prod.in
 #
-cfgv==3.3.1
-    # via pre-commit
 click==8.0.3
     # via -r ./requirements/prod.in
-distlib==0.3.4
-    # via virtualenv
-filelock==3.6.0
-    # via virtualenv
 graphviz==0.19.1
     # via -r ./requirements/prod.in
-identify==2.4.11
-    # via pre-commit
-nodeenv==1.6.0
-    # via pre-commit
-platformdirs==2.5.1
-    # via virtualenv
-pre-commit==2.17.0
-    # via -r ./requirements/prod.in
-pyyaml==6.0
-    # via pre-commit
-six==1.16.0
-    # via virtualenv
-toml==0.10.2
-    # via pre-commit
-virtualenv==20.13.2
-    # via pre-commit

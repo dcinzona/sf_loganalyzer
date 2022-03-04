@@ -1,0 +1,807 @@
+36.0 APEX_CODE,FINEST;APEX_PROFILING,FINEST;CALLOUT,FINEST;DB,FINEST;NBA,NONE;SYSTEM,INFO;VALIDATION,INFO;VISUALFORCE,FINER;WAVE,NONE;WORKFLOW,FINER
+13:47:11.0 (245598)|USER_INFO|[EXTERNAL]|00536000000xww3|REDACTED|(GMT-05:00) Eastern Standard Time (America/New_York)|GMT-05:00
+13:47:11.0 (302642)|EXECUTION_STARTED
+13:47:11.0 (308177)|CODE_UNIT_STARTED|[EXTERNAL]|TRIGGERS
+13:47:11.0 (351866)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.0 (405748)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.0 (489079)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.0 (1332788)|HEAP_ALLOCATE|[79]|Bytes:3
+13:47:11.0 (1417869)|HEAP_ALLOCATE|[84]|Bytes:152
+13:47:11.0 (1438420)|HEAP_ALLOCATE|[399]|Bytes:408
+13:47:11.0 (1456471)|HEAP_ALLOCATE|[412]|Bytes:408
+13:47:11.0 (1471655)|HEAP_ALLOCATE|[520]|Bytes:48
+13:47:11.0 (1519418)|HEAP_ALLOCATE|[139]|Bytes:6
+13:47:11.0 (1550426)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:1
+13:47:11.0 (1575796)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.0 (1586841)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.0 (1740521)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x5ec9f480
+13:47:11.0 (2011796)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.0 (2028701)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.0 (2057534)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x5ec9f480
+13:47:11.0 (2071037)|STATEMENT_EXECUTE|[1]
+13:47:11.0 (2131817)|HEAP_ALLOCATE|[52]|Bytes:5
+13:47:11.0 (2187540)|HEAP_ALLOCATE|[58]|Bytes:5
+13:47:11.0 (2199574)|HEAP_ALLOCATE|[66]|Bytes:7
+13:47:11.0 (2243047)|STATEMENT_EXECUTE|[2]
+13:47:11.0 (2253077)|STATEMENT_EXECUTE|[5]
+13:47:11.0 (2255685)|STATEMENT_EXECUTE|[6]
+13:47:11.0 (2259651)|HEAP_ALLOCATE|[6]|Bytes:21
+13:47:11.0 (2667716)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.0 (2756165)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.0 (2776319)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.0 (2799911)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.0 (2811212)|STATEMENT_EXECUTE|[7]
+13:47:11.0 (2815603)|HEAP_ALLOCATE|[7]|Bytes:11
+13:47:11.0 (2820539)|HEAP_ALLOCATE|[7]|Bytes:10
+13:47:11.0 (2845409)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.0 (3942620)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.0 (4014645)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.0 (4029784)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.0 (4835642)|LIMIT_USAGE|[7]|FUTURE|1|50
+13:47:11.0 (4894820)|LIMIT_USAGE|[7]|MAX_ASYNC|1|200
+13:47:11.25 (25381804)|CUMULATIVE_LIMIT_USAGE
+13:47:11.25 (25381804)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.25 (25381804)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 1 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.25 (25381804)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.25 (25381804)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.0 (28223889)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.73 (73808773)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.73 (73867954)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.73 (73916508)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.73 (74015340)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.73 (74027851)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.73 (74109117)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x7649dea7
+13:47:11.73 (74139972)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.73 (74146933)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.73 (74160755)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x7649dea7
+13:47:11.73 (74173354)|STATEMENT_EXECUTE|[1]
+13:47:11.73 (74189932)|STATEMENT_EXECUTE|[2]
+13:47:11.73 (74197319)|STATEMENT_EXECUTE|[5]
+13:47:11.73 (74199980)|STATEMENT_EXECUTE|[6]
+13:47:11.73 (74256891)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.73 (74296777)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.73 (74311245)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.73 (74325650)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.73 (74342815)|STATEMENT_EXECUTE|[7]
+13:47:11.73 (74358424)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.73 (74379759)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.73 (74402684)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.73 (74413912)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.73 (74452910)|LIMIT_USAGE|[7]|FUTURE|2|50
+13:47:11.73 (74462782)|LIMIT_USAGE|[7]|MAX_ASYNC|2|200
+13:47:11.88 (88541133)|CUMULATIVE_LIMIT_USAGE
+13:47:11.88 (88541133)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.88 (88541133)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 2 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.88 (88541133)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.88 (88541133)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.110 (110220283)|FLOW_CREATE_INTERVIEW_BEGIN|00D36000000KMsW|3001Q000000LTpv|3011Q000000FTtd
+13:47:11.110 (110941469)|FLOW_CREATE_INTERVIEW_END|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|LogTest PB
+13:47:11.111 (111782028)|FLOW_START_INTERVIEWS_BEGIN|1
+13:47:11.111 (111992773)|FLOW_START_INTERVIEW_BEGIN|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|LogTest PB
+13:47:11.111 (112252349)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 0 out of 100
+13:47:11.111 (112269484)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL query rows: 0 out of 50000
+13:47:11.111 (112280249)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.111 (112291283)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML statements: 0 out of 150
+13:47:11.111 (112305658)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML rows: 0 out of 10000
+13:47:11.111 (112317943)|FLOW_START_INTERVIEW_LIMIT_USAGE|CPU time in ms: 47 out of 15000
+13:47:11.111 (112377454)|FLOW_START_INTERVIEW_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.111 (112389207)|FLOW_START_INTERVIEW_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.111 (112399414)|FLOW_START_INTERVIEW_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.111 (112410729)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 2 out of 50
+13:47:11.111 (112420177)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.111 (112431976)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
+13:47:11.111 (114563372)|FLOW_VALUE_ASSIGNMENT|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|myVariable_old|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:39:53, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:39:53, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.111 (115565568)|FLOW_VALUE_ASSIGNMENT|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|myVariable_current|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated on 2022-02-21 at 18:47:11.078, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:47:11, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:47:11, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.111 (115604559)|FLOW_VALUE_ASSIGNMENT|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|RecursiveCountVariable|0
+13:47:11.111 (115857259)|FLOW_ELEMENT_BEGIN|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|FlowDecision|myDecision
+13:47:11.111 (116188487)|FLOW_RULE_DETAIL|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|myRule_1|true|false
+13:47:11.111 (116236322)|FLOW_VALUE_ASSIGNMENT|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|myRule_1|true
+13:47:11.111 (116650078)|FLOW_ELEMENT_LIMIT_USAGE|4 ms CPU time, total 51 out of 15000
+13:47:11.111 (116703373)|FLOW_ELEMENT_END|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|FlowDecision|myDecision
+13:47:11.111 (116749210)|FLOW_ELEMENT_BEGIN|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|FlowRecordUpdate|myRule_1_A1
+13:47:11.111 (116810061)|FLOW_ELEMENT_DEFERRED|FlowRecordUpdate|myRule_1_A1
+13:47:11.111 (116855424)|FLOW_ELEMENT_END|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|FlowRecordUpdate|myRule_1_A1
+13:47:11.111 (116922468)|FLOW_START_INTERVIEW_END|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|LogTest PB
+13:47:11.111 (116956063)|FLOW_BULK_ELEMENT_BEGIN|FlowRecordUpdate|myRule_1_A1
+13:47:11.111 (248639772)|FLOW_BULK_ELEMENT_DETAIL|FlowRecordUpdate|myRule_1_A1|1
+13:47:11.258 (258707817)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.258 (258771529)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.258 (258832255)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.258 (258954952)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.258 (258969640)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.258 (259043354)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x2ecc6fc6
+13:47:11.258 (259076323)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.258 (259083587)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.258 (259097859)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x2ecc6fc6
+13:47:11.258 (259107459)|STATEMENT_EXECUTE|[1]
+13:47:11.258 (259121563)|STATEMENT_EXECUTE|[2]
+13:47:11.258 (259128653)|STATEMENT_EXECUTE|[5]
+13:47:11.258 (259131177)|STATEMENT_EXECUTE|[6]
+13:47:11.258 (259190876)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.258 (259231514)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.258 (259246646)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.258 (259259773)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.258 (259269938)|STATEMENT_EXECUTE|[7]
+13:47:11.258 (259281589)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.258 (259301902)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.258 (259342328)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.258 (259358367)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.258 (259397301)|LIMIT_USAGE|[7]|FUTURE|3|50
+13:47:11.258 (259408457)|LIMIT_USAGE|[7]|MAX_ASYNC|3|200
+13:47:11.272 (272234387)|CUMULATIVE_LIMIT_USAGE
+13:47:11.272 (272234387)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.272 (272234387)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 1 out of 100
+  Number of query rows: 1 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 1 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 1 out of 10000
+  Maximum CPU time: 51 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 3 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.272 (272234387)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.272 (272234387)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.258 (273585809)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.111 (294260390)|FLOW_VALUE_ASSIGNMENT|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|myRule_1_A1|true
+13:47:11.111 (294438341)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL queries, total 1 out of 100
+13:47:11.111 (294458930)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL query rows, total 1 out of 50000
+13:47:11.111 (294477184)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML statements, total 1 out of 150
+13:47:11.111 (294492286)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML rows, total 1 out of 10000
+13:47:11.111 (294504012)|FLOW_BULK_ELEMENT_LIMIT_USAGE|117 ms CPU time, total 168 out of 15000
+13:47:11.111 (294548824)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 future calls, total 3 out of 50
+13:47:11.111 (294599837)|FLOW_BULK_ELEMENT_END|FlowRecordUpdate|myRule_1_A1|1|177
+13:47:11.111 (294765079)|FLOW_START_INTERVIEWS_END|1
+13:47:11.111 (294870401)|FLOW_INTERVIEW_FINISHED|25117fcedd2011df5c5731cb3f3117f1d828bba-4870|LogTest PB
+13:47:11.111 (294941462)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL queries: 1 out of 100
+13:47:11.111 (294952587)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL query rows: 1 out of 50000
+13:47:11.111 (294962201)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.111 (294970734)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML statements: 1 out of 150
+13:47:11.111 (294978810)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML rows: 1 out of 10000
+13:47:11.111 (294988148)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|CPU time in ms: 168 out of 15000
+13:47:11.111 (295017318)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.111 (295029092)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.111 (295037922)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.111 (295046257)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Future calls: 3 out of 50
+13:47:11.111 (295053880)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.298 (298049626)|FLOW_CREATE_INTERVIEW_BEGIN|00D36000000KMsW|3001Q000000LTpv|3011Q000000FTtd
+13:47:11.298 (298147060)|FLOW_CREATE_INTERVIEW_END|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|LogTest PB
+13:47:11.298 (298902596)|FLOW_START_INTERVIEWS_BEGIN|1
+13:47:11.298 (298952997)|FLOW_START_INTERVIEW_BEGIN|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|LogTest PB
+13:47:11.298 (299024755)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 1 out of 100
+13:47:11.298 (299042343)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL query rows: 1 out of 50000
+13:47:11.298 (299053891)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.298 (299065861)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML statements: 1 out of 150
+13:47:11.298 (299077917)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML rows: 1 out of 10000
+13:47:11.298 (299090201)|FLOW_START_INTERVIEW_LIMIT_USAGE|CPU time in ms: 171 out of 15000
+13:47:11.298 (299123098)|FLOW_START_INTERVIEW_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.298 (299135224)|FLOW_START_INTERVIEW_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.298 (299147689)|FLOW_START_INTERVIEW_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.298 (299160690)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 3 out of 50
+13:47:11.298 (299172863)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.298 (299184351)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
+13:47:11.298 (300616248)|FLOW_VALUE_ASSIGNMENT|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|myVariable_old|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:39:53, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:39:53, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.298 (301245394)|FLOW_VALUE_ASSIGNMENT|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|myVariable_current|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:47:11, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:47:11, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.298 (301271487)|FLOW_VALUE_ASSIGNMENT|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|RecursiveCountVariable|1
+13:47:11.298 (301382401)|FLOW_ELEMENT_BEGIN|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|FlowDecision|myDecision
+13:47:11.298 (301596430)|FLOW_RULE_DETAIL|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|myRule_1|true|false
+13:47:11.298 (301625451)|FLOW_VALUE_ASSIGNMENT|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|myRule_1|true
+13:47:11.298 (301680597)|FLOW_ELEMENT_LIMIT_USAGE|3 ms CPU time, total 174 out of 15000
+13:47:11.298 (301703195)|FLOW_ELEMENT_END|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|FlowDecision|myDecision
+13:47:11.298 (301722766)|FLOW_ELEMENT_BEGIN|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|FlowRecordUpdate|myRule_1_A1
+13:47:11.298 (301753129)|FLOW_ELEMENT_DEFERRED|FlowRecordUpdate|myRule_1_A1
+13:47:11.298 (301777520)|FLOW_ELEMENT_END|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|FlowRecordUpdate|myRule_1_A1
+13:47:11.298 (301806756)|FLOW_START_INTERVIEW_END|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|LogTest PB
+13:47:11.298 (301829316)|FLOW_BULK_ELEMENT_BEGIN|FlowRecordUpdate|myRule_1_A1
+13:47:11.298 (327506466)|FLOW_BULK_ELEMENT_DETAIL|FlowRecordUpdate|myRule_1_A1|1
+13:47:11.337 (337996022)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.337 (338065760)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.337 (338114614)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.337 (338209689)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.337 (338222331)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.337 (338290732)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x7893000c
+13:47:11.337 (338322515)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.337 (338329475)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.337 (338355174)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x7893000c
+13:47:11.337 (338365502)|STATEMENT_EXECUTE|[1]
+13:47:11.337 (338384061)|STATEMENT_EXECUTE|[2]
+13:47:11.337 (338390962)|STATEMENT_EXECUTE|[5]
+13:47:11.337 (338393535)|STATEMENT_EXECUTE|[6]
+13:47:11.337 (338457896)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.337 (338501497)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.337 (338515587)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.337 (338530741)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.337 (338541132)|STATEMENT_EXECUTE|[7]
+13:47:11.337 (338554503)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.337 (338574068)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.337 (338597953)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.337 (338608939)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.337 (338647502)|LIMIT_USAGE|[7]|FUTURE|4|50
+13:47:11.337 (338658096)|LIMIT_USAGE|[7]|MAX_ASYNC|4|200
+13:47:11.351 (351632622)|CUMULATIVE_LIMIT_USAGE
+13:47:11.351 (351632622)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.351 (351632622)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 2 out of 100
+  Number of query rows: 2 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 2 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 2 out of 10000
+  Maximum CPU time: 174 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 4 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.351 (351632622)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.351 (351632622)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.337 (353039573)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.298 (367834614)|FLOW_VALUE_ASSIGNMENT|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|myRule_1_A1|true
+13:47:11.298 (368003410)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL queries, total 2 out of 100
+13:47:11.298 (368019486)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL query rows, total 2 out of 50000
+13:47:11.298 (368030193)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML statements, total 2 out of 150
+13:47:11.298 (368039906)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML rows, total 2 out of 10000
+13:47:11.298 (368048490)|FLOW_BULK_ELEMENT_LIMIT_USAGE|38 ms CPU time, total 212 out of 15000
+13:47:11.298 (368086153)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 future calls, total 4 out of 50
+13:47:11.298 (368103203)|FLOW_BULK_ELEMENT_END|FlowRecordUpdate|myRule_1_A1|1|66
+13:47:11.298 (368194366)|FLOW_START_INTERVIEWS_END|1
+13:47:11.298 (368223460)|FLOW_INTERVIEW_FINISHED|25157fcedd2011df5c5731cb3f3117f1d828bba-4874|LogTest PB
+13:47:11.298 (368251695)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL queries: 2 out of 100
+13:47:11.298 (368258780)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL query rows: 2 out of 50000
+13:47:11.298 (368264818)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.298 (368270035)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML statements: 2 out of 150
+13:47:11.298 (368276018)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML rows: 2 out of 10000
+13:47:11.298 (368281778)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|CPU time in ms: 212 out of 15000
+13:47:11.298 (368298327)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.298 (368304654)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.298 (368310552)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.298 (368315739)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Future calls: 4 out of 50
+13:47:11.298 (368321291)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.370 (370300390)|FLOW_CREATE_INTERVIEW_BEGIN|00D36000000KMsW|3001Q000000LTpv|3011Q000000FTtd
+13:47:11.370 (370408486)|FLOW_CREATE_INTERVIEW_END|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|LogTest PB
+13:47:11.370 (370975302)|FLOW_START_INTERVIEWS_BEGIN|1
+13:47:11.370 (371017736)|FLOW_START_INTERVIEW_BEGIN|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|LogTest PB
+13:47:11.370 (371075903)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 2 out of 100
+13:47:11.370 (371087577)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL query rows: 2 out of 50000
+13:47:11.370 (371096091)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.370 (371105359)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML statements: 2 out of 150
+13:47:11.370 (371115064)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML rows: 2 out of 10000
+13:47:11.370 (371124242)|FLOW_START_INTERVIEW_LIMIT_USAGE|CPU time in ms: 214 out of 15000
+13:47:11.370 (371154461)|FLOW_START_INTERVIEW_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.370 (371163138)|FLOW_START_INTERVIEW_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.370 (371171612)|FLOW_START_INTERVIEW_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.370 (371179722)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 4 out of 50
+13:47:11.370 (371187401)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.370 (371195296)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
+13:47:11.370 (372047719)|FLOW_VALUE_ASSIGNMENT|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|myVariable_old|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:39:53, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:39:53, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.370 (372616248)|FLOW_VALUE_ASSIGNMENT|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|myVariable_current|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:47:11, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:47:11, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.370 (372641918)|FLOW_VALUE_ASSIGNMENT|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|RecursiveCountVariable|2
+13:47:11.370 (372738381)|FLOW_ELEMENT_BEGIN|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|FlowDecision|myDecision
+13:47:11.370 (372914248)|FLOW_RULE_DETAIL|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|myRule_1|true|false
+13:47:11.370 (372941101)|FLOW_VALUE_ASSIGNMENT|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|myRule_1|true
+13:47:11.370 (372996948)|FLOW_ELEMENT_LIMIT_USAGE|2 ms CPU time, total 216 out of 15000
+13:47:11.370 (373017992)|FLOW_ELEMENT_END|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|FlowDecision|myDecision
+13:47:11.370 (373038439)|FLOW_ELEMENT_BEGIN|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|FlowRecordUpdate|myRule_1_A1
+13:47:11.370 (373067509)|FLOW_ELEMENT_DEFERRED|FlowRecordUpdate|myRule_1_A1
+13:47:11.370 (373091954)|FLOW_ELEMENT_END|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|FlowRecordUpdate|myRule_1_A1
+13:47:11.370 (373120190)|FLOW_START_INTERVIEW_END|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|LogTest PB
+13:47:11.370 (373142747)|FLOW_BULK_ELEMENT_BEGIN|FlowRecordUpdate|myRule_1_A1
+13:47:11.370 (388118116)|FLOW_BULK_ELEMENT_DETAIL|FlowRecordUpdate|myRule_1_A1|1
+13:47:11.398 (398548879)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.398 (398615149)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.398 (398673221)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.398 (398766830)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.398 (398781858)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.398 (398857672)|VARIABLE_ASSIGNMENT|[1]|this|{}|0xdead0c9
+13:47:11.398 (398894275)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.398 (398902662)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.398 (398921748)|VARIABLE_ASSIGNMENT|[1]|this|{}|0xdead0c9
+13:47:11.398 (398934699)|STATEMENT_EXECUTE|[1]
+13:47:11.398 (398951178)|STATEMENT_EXECUTE|[2]
+13:47:11.398 (398960352)|STATEMENT_EXECUTE|[5]
+13:47:11.398 (398964232)|STATEMENT_EXECUTE|[6]
+13:47:11.398 (399040797)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.398 (399092924)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.398 (399113851)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.398 (399134019)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.398 (399148043)|STATEMENT_EXECUTE|[7]
+13:47:11.398 (399164729)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.398 (399191032)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.398 (399221551)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.398 (399237532)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.398 (399285236)|LIMIT_USAGE|[7]|FUTURE|5|50
+13:47:11.398 (399299773)|LIMIT_USAGE|[7]|MAX_ASYNC|5|200
+13:47:11.412 (412083225)|CUMULATIVE_LIMIT_USAGE
+13:47:11.412 (412083225)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.412 (412083225)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 3 out of 100
+  Number of query rows: 3 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 3 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 216 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 5 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.412 (412083225)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.412 (412083225)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.398 (413647844)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.370 (427346740)|FLOW_VALUE_ASSIGNMENT|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|myRule_1_A1|true
+13:47:11.370 (427502172)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL queries, total 3 out of 100
+13:47:11.370 (427515918)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL query rows, total 3 out of 50000
+13:47:11.370 (427525993)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML statements, total 3 out of 150
+13:47:11.370 (427534778)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML rows, total 3 out of 10000
+13:47:11.370 (427543500)|FLOW_BULK_ELEMENT_LIMIT_USAGE|29 ms CPU time, total 245 out of 15000
+13:47:11.370 (427580706)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 future calls, total 5 out of 50
+13:47:11.370 (427597961)|FLOW_BULK_ELEMENT_END|FlowRecordUpdate|myRule_1_A1|1|54
+13:47:11.370 (427681398)|FLOW_START_INTERVIEWS_END|1
+13:47:11.370 (427709127)|FLOW_INTERVIEW_FINISHED|25167fcedd2011df5c5731cb3f3117f1d828bba-4875|LogTest PB
+13:47:11.370 (427765025)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL queries: 3 out of 100
+13:47:11.370 (427771498)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL query rows: 3 out of 50000
+13:47:11.370 (427777422)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.370 (427782843)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML statements: 3 out of 150
+13:47:11.370 (427789274)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML rows: 3 out of 10000
+13:47:11.370 (427795175)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|CPU time in ms: 245 out of 15000
+13:47:11.370 (427813838)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.370 (427820323)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.370 (427826240)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.370 (427831685)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Future calls: 5 out of 50
+13:47:11.370 (427837085)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.430 (430070209)|FLOW_CREATE_INTERVIEW_BEGIN|00D36000000KMsW|3001Q000000LTpv|3011Q000000FTtd
+13:47:11.430 (430169455)|FLOW_CREATE_INTERVIEW_END|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|LogTest PB
+13:47:11.430 (430816762)|FLOW_START_INTERVIEWS_BEGIN|1
+13:47:11.430 (430853641)|FLOW_START_INTERVIEW_BEGIN|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|LogTest PB
+13:47:11.430 (430927266)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 3 out of 100
+13:47:11.430 (430939843)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL query rows: 3 out of 50000
+13:47:11.430 (430948706)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.430 (430957088)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML statements: 3 out of 150
+13:47:11.430 (430966323)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML rows: 3 out of 10000
+13:47:11.430 (430975272)|FLOW_START_INTERVIEW_LIMIT_USAGE|CPU time in ms: 248 out of 15000
+13:47:11.430 (431007640)|FLOW_START_INTERVIEW_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.430 (431016411)|FLOW_START_INTERVIEW_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.430 (431024478)|FLOW_START_INTERVIEW_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.430 (431032202)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 5 out of 50
+13:47:11.430 (431039671)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.430 (431047760)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
+13:47:11.430 (431935455)|FLOW_VALUE_ASSIGNMENT|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|myVariable_old|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:39:53, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:39:53, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.430 (432516579)|FLOW_VALUE_ASSIGNMENT|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|myVariable_current|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:47:11, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:47:11, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.430 (432542352)|FLOW_VALUE_ASSIGNMENT|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|RecursiveCountVariable|3
+13:47:11.430 (432633616)|FLOW_ELEMENT_BEGIN|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|FlowDecision|myDecision
+13:47:11.430 (432851517)|FLOW_RULE_DETAIL|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|myRule_1|true|false
+13:47:11.430 (432877261)|FLOW_VALUE_ASSIGNMENT|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|myRule_1|true
+13:47:11.430 (432932966)|FLOW_ELEMENT_LIMIT_USAGE|2 ms CPU time, total 250 out of 15000
+13:47:11.430 (432954862)|FLOW_ELEMENT_END|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|FlowDecision|myDecision
+13:47:11.430 (432974109)|FLOW_ELEMENT_BEGIN|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|FlowRecordUpdate|myRule_1_A1
+13:47:11.430 (432997599)|FLOW_ELEMENT_DEFERRED|FlowRecordUpdate|myRule_1_A1
+13:47:11.430 (433021798)|FLOW_ELEMENT_END|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|FlowRecordUpdate|myRule_1_A1
+13:47:11.430 (433048853)|FLOW_START_INTERVIEW_END|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|LogTest PB
+13:47:11.430 (433071372)|FLOW_BULK_ELEMENT_BEGIN|FlowRecordUpdate|myRule_1_A1
+13:47:11.430 (451047075)|FLOW_BULK_ELEMENT_DETAIL|FlowRecordUpdate|myRule_1_A1|1
+13:47:11.461 (461530058)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.461 (461593769)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.461 (461648267)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.461 (461751272)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.461 (461764267)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.461 (461835350)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x42f93cdf
+13:47:11.461 (461867640)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.461 (461874498)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.461 (461887976)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x42f93cdf
+13:47:11.461 (461897599)|STATEMENT_EXECUTE|[1]
+13:47:11.461 (461913491)|STATEMENT_EXECUTE|[2]
+13:47:11.461 (461920941)|STATEMENT_EXECUTE|[5]
+13:47:11.461 (461923399)|STATEMENT_EXECUTE|[6]
+13:47:11.461 (461980525)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.461 (462020557)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.461 (462034627)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.461 (462049911)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.461 (462060118)|STATEMENT_EXECUTE|[7]
+13:47:11.461 (462075384)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.461 (462094737)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.461 (462119741)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.461 (462131001)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.461 (462167911)|LIMIT_USAGE|[7]|FUTURE|6|50
+13:47:11.461 (462178573)|LIMIT_USAGE|[7]|MAX_ASYNC|6|200
+13:47:11.475 (475798969)|CUMULATIVE_LIMIT_USAGE
+13:47:11.475 (475798969)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.475 (475798969)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 4 out of 100
+  Number of query rows: 4 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 4 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 4 out of 10000
+  Maximum CPU time: 250 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 6 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.475 (475798969)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.475 (475798969)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.461 (477239146)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.430 (493436588)|FLOW_VALUE_ASSIGNMENT|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|myRule_1_A1|true
+13:47:11.430 (493619560)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL queries, total 4 out of 100
+13:47:11.430 (493639690)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL query rows, total 4 out of 50000
+13:47:11.430 (493653923)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML statements, total 4 out of 150
+13:47:11.430 (493666200)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML rows, total 4 out of 10000
+13:47:11.430 (493678762)|FLOW_BULK_ELEMENT_LIMIT_USAGE|32 ms CPU time, total 282 out of 15000
+13:47:11.430 (493723807)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 future calls, total 6 out of 50
+13:47:11.430 (493750370)|FLOW_BULK_ELEMENT_END|FlowRecordUpdate|myRule_1_A1|1|60
+13:47:11.430 (493865739)|FLOW_START_INTERVIEWS_END|1
+13:47:11.430 (493903018)|FLOW_INTERVIEW_FINISHED|25177fcedd2011df5c5731cb3f3117f1d828bba-4876|LogTest PB
+13:47:11.430 (493937830)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL queries: 4 out of 100
+13:47:11.430 (493948005)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL query rows: 4 out of 50000
+13:47:11.430 (493957350)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.430 (493965857)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML statements: 4 out of 150
+13:47:11.430 (493974251)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML rows: 4 out of 10000
+13:47:11.430 (493982541)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|CPU time in ms: 282 out of 15000
+13:47:11.430 (494007930)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.430 (494017052)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.430 (494026173)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.430 (494034180)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Future calls: 6 out of 50
+13:47:11.430 (494041910)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.496 (496226987)|FLOW_CREATE_INTERVIEW_BEGIN|00D36000000KMsW|3001Q000000LTpv|3011Q000000FTtd
+13:47:11.496 (496317437)|FLOW_CREATE_INTERVIEW_END|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|LogTest PB
+13:47:11.497 (497036052)|FLOW_START_INTERVIEWS_BEGIN|1
+13:47:11.497 (497081840)|FLOW_START_INTERVIEW_BEGIN|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|LogTest PB
+13:47:11.497 (497155483)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 4 out of 100
+13:47:11.497 (497171908)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL query rows: 4 out of 50000
+13:47:11.497 (497182870)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.497 (497193946)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML statements: 4 out of 150
+13:47:11.497 (497206558)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML rows: 4 out of 10000
+13:47:11.497 (497217834)|FLOW_START_INTERVIEW_LIMIT_USAGE|CPU time in ms: 285 out of 15000
+13:47:11.497 (497250638)|FLOW_START_INTERVIEW_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.497 (497262915)|FLOW_START_INTERVIEW_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.497 (497273954)|FLOW_START_INTERVIEW_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.497 (497284516)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 6 out of 50
+13:47:11.497 (497294781)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.497 (497305904)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
+13:47:11.497 (498628115)|FLOW_VALUE_ASSIGNMENT|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|myVariable_old|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:39:53, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:39:53, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.497 (500019719)|FLOW_VALUE_ASSIGNMENT|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|myVariable_current|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:47:11, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:47:11, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.497 (500064255)|FLOW_VALUE_ASSIGNMENT|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|RecursiveCountVariable|4
+13:47:11.497 (500189636)|FLOW_ELEMENT_BEGIN|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|FlowDecision|myDecision
+13:47:11.497 (500453460)|FLOW_RULE_DETAIL|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|myRule_1|true|false
+13:47:11.497 (500494162)|FLOW_VALUE_ASSIGNMENT|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|myRule_1|true
+13:47:11.497 (500561672)|FLOW_ELEMENT_LIMIT_USAGE|3 ms CPU time, total 288 out of 15000
+13:47:11.497 (500595000)|FLOW_ELEMENT_END|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|FlowDecision|myDecision
+13:47:11.497 (500648063)|FLOW_ELEMENT_BEGIN|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|FlowRecordUpdate|myRule_1_A1
+13:47:11.497 (500687617)|FLOW_ELEMENT_DEFERRED|FlowRecordUpdate|myRule_1_A1
+13:47:11.497 (500732848)|FLOW_ELEMENT_END|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|FlowRecordUpdate|myRule_1_A1
+13:47:11.497 (500820525)|FLOW_START_INTERVIEW_END|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|LogTest PB
+13:47:11.497 (500868320)|FLOW_BULK_ELEMENT_BEGIN|FlowRecordUpdate|myRule_1_A1
+13:47:11.497 (522350483)|FLOW_BULK_ELEMENT_DETAIL|FlowRecordUpdate|myRule_1_A1|1
+13:47:11.532 (532563954)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.532 (532649498)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.532 (532708006)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.532 (532821593)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.532 (532838672)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.532 (532928672)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x392e2d5e
+13:47:11.532 (532970948)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.532 (532980898)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.532 (533002400)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x392e2d5e
+13:47:11.532 (533016512)|STATEMENT_EXECUTE|[1]
+13:47:11.532 (533034117)|STATEMENT_EXECUTE|[2]
+13:47:11.532 (533043461)|STATEMENT_EXECUTE|[5]
+13:47:11.532 (533046748)|STATEMENT_EXECUTE|[6]
+13:47:11.532 (533118118)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.532 (533168635)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.532 (533189818)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.532 (533207191)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.532 (533221351)|STATEMENT_EXECUTE|[7]
+13:47:11.532 (533238473)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.532 (533264568)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.532 (533295093)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.532 (533311803)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.532 (533367129)|LIMIT_USAGE|[7]|FUTURE|7|50
+13:47:11.532 (533383659)|LIMIT_USAGE|[7]|MAX_ASYNC|7|200
+13:47:11.551 (551487624)|CUMULATIVE_LIMIT_USAGE
+13:47:11.551 (551487624)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.551 (551487624)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 5 out of 100
+  Number of query rows: 5 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 5 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 5 out of 10000
+  Maximum CPU time: 288 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 7 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.551 (551487624)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.551 (551487624)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.532 (552983322)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.497 (567696262)|FLOW_VALUE_ASSIGNMENT|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|myRule_1_A1|true
+13:47:11.497 (567851580)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL queries, total 5 out of 100
+13:47:11.497 (567865046)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL query rows, total 5 out of 50000
+13:47:11.497 (567875631)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML statements, total 5 out of 150
+13:47:11.497 (567885368)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML rows, total 5 out of 10000
+13:47:11.497 (567894441)|FLOW_BULK_ELEMENT_LIMIT_USAGE|37 ms CPU time, total 325 out of 15000
+13:47:11.497 (567931215)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 future calls, total 7 out of 50
+13:47:11.497 (567949845)|FLOW_BULK_ELEMENT_END|FlowRecordUpdate|myRule_1_A1|1|66
+13:47:11.497 (568034489)|FLOW_START_INTERVIEWS_END|1
+13:47:11.497 (568064390)|FLOW_INTERVIEW_FINISHED|25187fcedd2011df5c5731cb3f3117f1d828bba-4877|LogTest PB
+13:47:11.497 (568088573)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL queries: 5 out of 100
+13:47:11.497 (568094776)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL query rows: 5 out of 50000
+13:47:11.497 (568101152)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.497 (568106451)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML statements: 5 out of 150
+13:47:11.497 (568112285)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML rows: 5 out of 10000
+13:47:11.497 (568118277)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|CPU time in ms: 325 out of 15000
+13:47:11.497 (568134511)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.497 (568141241)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.497 (568147092)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.497 (568151992)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Future calls: 7 out of 50
+13:47:11.497 (568157657)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.570 (570052333)|FLOW_CREATE_INTERVIEW_BEGIN|00D36000000KMsW|3001Q000000LTpv|3011Q000000FTtd
+13:47:11.570 (570145732)|FLOW_CREATE_INTERVIEW_END|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|LogTest PB
+13:47:11.570 (570911073)|FLOW_START_INTERVIEWS_BEGIN|1
+13:47:11.570 (570954366)|FLOW_START_INTERVIEW_BEGIN|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|LogTest PB
+13:47:11.570 (571022226)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL queries: 5 out of 100
+13:47:11.570 (571037640)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOQL query rows: 5 out of 50000
+13:47:11.570 (571049347)|FLOW_START_INTERVIEW_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.570 (571060577)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML statements: 5 out of 150
+13:47:11.570 (571073270)|FLOW_START_INTERVIEW_LIMIT_USAGE|DML rows: 5 out of 10000
+13:47:11.570 (571084743)|FLOW_START_INTERVIEW_LIMIT_USAGE|CPU time in ms: 328 out of 15000
+13:47:11.570 (571125361)|FLOW_START_INTERVIEW_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.570 (571136376)|FLOW_START_INTERVIEW_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.570 (571146729)|FLOW_START_INTERVIEW_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.570 (571157799)|FLOW_START_INTERVIEW_LIMIT_USAGE|Future calls: 7 out of 50
+13:47:11.570 (571168006)|FLOW_START_INTERVIEW_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.570 (571178777)|FLOW_START_INTERVIEW_LIMIT_USAGE|Push notifications: 0 out of 10
+13:47:11.570 (572429595)|FLOW_VALUE_ASSIGNMENT|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|myVariable_old|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:39:53, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:39:53, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.570 (573376745)|FLOW_VALUE_ASSIGNMENT|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|myVariable_current|{Id=0011Q00002TN9xoQAD, IsDeleted=false, MasterRecordId=null, Name=LogTest, Type=null, RecordTypeId=01236000001UNovAAG, ParentId=null, BillingStreet=null, BillingCity=null, BillingState=null, BillingPostalCode=null, BillingCountry=null, BillingLatitude=null, BillingLongitude=null, BillingGeocodeAccuracy=null, ShippingStreet=null, ShippingCity=null, ShippingState=null, ShippingPostalCode=null, ShippingCountry=null, ShippingLatitude=null, ShippingLongitude=null, ShippingGeocodeAccuracy=null, Phone=null, Fax=null, AccountNumber=null, Website=null, PhotoUrl=null, Sic=null, Industry=null, AnnualRevenue=null, NumberOfEmployees=null, Ownership=null, TickerSymbol=null, Description=Updated by Process Builder on: 1900-01-01 00:00:00Z, Rating=null, Site=null, OwnerId=00536000000xww3AAA, CreatedDate=2022-02-21 17:58:27, CreatedById=00536000000xww3AAA, LastModifiedDate=2022-02-21 18:47:11, LastModifiedById=00536000000xww3AAA, SystemModstamp=2022-02-21 18:47:11, LastActivityDate=null, LastViewedDate=null, LastReferencedDate=null, IsExcludedFromRealign=false, IsPartner=false, IsCustomerPortal=false, ChannelProgramName=null, ChannelProgramLevelName=null, Jigsaw=null, JigsawCompanyId=null, CleanStatus=Pending, AccountSource=null, DunsNumber=null, Tradestyle=null, NaicsCode=null, NaicsDesc=null, YearStarted=null, SicDesc=null, DandbCompanyId=null, ConnectionReceivedId=null, ConnectionSentId=null, Tier=null, gmt__CustomerPriority__c=null, gmt__SLA__c=null, gmt__Active__c=null, gmt__NumberofLocations__c=null, gmt__UpsellOpportunity__c=null, gmt__SLASerialNumber__c=null, gmt__SLAExpirationDate__c=null, gmt__Potential_Value__c=0.0, gmt__Customer_ID__c=null, gmt__POC_WF_Opp_Rule__c=null, gmt__EncryptedField__c=null, gmt__HiearchyDepth__c=2.0, gmt__Root_Account_ID__c=null}
+13:47:11.570 (573412455)|FLOW_VALUE_ASSIGNMENT|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|RecursiveCountVariable|5
+13:47:11.570 (573524806)|FLOW_ELEMENT_BEGIN|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|FlowDecision|myDecision
+13:47:11.570 (573764091)|FLOW_RULE_DETAIL|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|myRule_1|true|false
+13:47:11.570 (573800152)|FLOW_VALUE_ASSIGNMENT|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|myRule_1|true
+13:47:11.570 (573871905)|FLOW_ELEMENT_LIMIT_USAGE|2 ms CPU time, total 330 out of 15000
+13:47:11.570 (573902707)|FLOW_ELEMENT_END|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|FlowDecision|myDecision
+13:47:11.570 (573927419)|FLOW_ELEMENT_BEGIN|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|FlowRecordUpdate|myRule_1_A1
+13:47:11.570 (573961475)|FLOW_ELEMENT_DEFERRED|FlowRecordUpdate|myRule_1_A1
+13:47:11.570 (573990606)|FLOW_ELEMENT_LIMIT_USAGE|1 ms CPU time, total 331 out of 15000
+13:47:11.570 (574004104)|FLOW_ELEMENT_END|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|FlowRecordUpdate|myRule_1_A1
+13:47:11.570 (574039433)|FLOW_START_INTERVIEW_END|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|LogTest PB
+13:47:11.570 (574069153)|FLOW_BULK_ELEMENT_BEGIN|FlowRecordUpdate|myRule_1_A1
+13:47:11.570 (593910660)|FLOW_BULK_ELEMENT_DETAIL|FlowRecordUpdate|myRule_1_A1|1
+13:47:11.605 (605987556)|CODE_UNIT_STARTED|[EXTERNAL]|01q360000009HAx|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.605 (606053177)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.605 (606100481)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:8
+13:47:11.605 (606198460)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.605 (606210649)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.605 (606308218)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x2e4fce2
+13:47:11.605 (606388744)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.605 (606412206)|VARIABLE_SCOPE_BEGIN|[1]|this|gmt.AccountTrigger|true|false
+13:47:11.605 (606458035)|VARIABLE_ASSIGNMENT|[1]|this|{}|0x2e4fce2
+13:47:11.605 (606472248)|STATEMENT_EXECUTE|[1]
+13:47:11.605 (606489918)|STATEMENT_EXECUTE|[2]
+13:47:11.605 (606497849)|STATEMENT_EXECUTE|[5]
+13:47:11.605 (606500390)|STATEMENT_EXECUTE|[6]
+13:47:11.605 (606564863)|HEAP_ALLOCATE|[6]|Bytes:26
+13:47:11.605 (606610760)|HEAP_ALLOCATE|[6]|Bytes:20
+13:47:11.605 (606626402)|HEAP_ALLOCATE|[6]|Bytes:41
+13:47:11.605 (606641102)|USER_DEBUG|[6]|DEBUG|Updating account(s): {0011Q00002TN9xoQAD}
+13:47:11.605 (606650902)|STATEMENT_EXECUTE|[7]
+13:47:11.605 (606663471)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.605 (606683347)|HEAP_ALLOCATE|[7]|Bytes:4
+13:47:11.605 (606707582)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.605 (606741726)|HEAP_ALLOCATE|[EXTERNAL]|Bytes:4
+13:47:11.605 (606783981)|LIMIT_USAGE|[7]|FUTURE|8|50
+13:47:11.605 (606795963)|LIMIT_USAGE|[7]|MAX_ASYNC|8|200
+13:47:11.620 (620327825)|CUMULATIVE_LIMIT_USAGE
+13:47:11.620 (620327825)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.620 (620327825)|LIMIT_USAGE_FOR_NS|gmt|
+  Number of SOQL queries: 6 out of 100
+  Number of query rows: 6 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 6 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 6 out of 10000
+  Maximum CPU time: 331 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 8 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+13:47:11.620 (620327825)|TOTAL_EMAIL_RECIPIENTS_QUEUED|0
+13:47:11.620 (620327825)|CUMULATIVE_LIMIT_USAGE_END
+
+13:47:11.605 (621559020)|CODE_UNIT_FINISHED|gmt.AccountTrigger on Account trigger event BeforeUpdate|__sfdc_trigger/gmt/AccountTrigger
+13:47:11.570 (637398876)|FLOW_VALUE_ASSIGNMENT|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|myRule_1_A1|true
+13:47:11.570 (637593050)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL queries, total 6 out of 100
+13:47:11.570 (637610267)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 SOQL query rows, total 6 out of 50000
+13:47:11.570 (637623474)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML statements, total 6 out of 150
+13:47:11.570 (637636000)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 DML rows, total 6 out of 10000
+13:47:11.570 (637647942)|FLOW_BULK_ELEMENT_LIMIT_USAGE|31 ms CPU time, total 362 out of 15000
+13:47:11.570 (637695809)|FLOW_BULK_ELEMENT_LIMIT_USAGE|1 future calls, total 8 out of 50
+13:47:11.570 (637718666)|FLOW_BULK_ELEMENT_END|FlowRecordUpdate|myRule_1_A1|1|63
+13:47:11.570 (637824485)|FLOW_START_INTERVIEWS_END|1
+13:47:11.570 (637860852)|FLOW_INTERVIEW_FINISHED|25197fcedd2011df5c5731cb3f3117f1d828bba-4878|LogTest PB
+13:47:11.570 (637893493)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL queries: 6 out of 100
+13:47:11.570 (637902260)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOQL query rows: 6 out of 50000
+13:47:11.570 (637910235)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|SOSL queries: 0 out of 20
+13:47:11.570 (637918046)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML statements: 6 out of 150
+13:47:11.570 (637926220)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|DML rows: 6 out of 10000
+13:47:11.570 (637934400)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|CPU time in ms: 362 out of 15000
+13:47:11.570 (637954928)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Heap size in bytes: 1039 out of 6000000
+13:47:11.570 (637963008)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Callouts: 0 out of 100
+13:47:11.570 (637970647)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Email invocations: 0 out of 10
+13:47:11.570 (637978570)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Future calls: 8 out of 50
+13:47:11.570 (637986918)|FLOW_INTERVIEW_FINISHED_LIMIT_USAGE|Jobs in queue: 0 out of 50
+13:47:11.0 (655177787)|CODE_UNIT_FINISHED|TRIGGERS
+13:47:11.0 (655206832)|EXECUTION_FINISHED
+13:47:11.656 (656981761)|CUMULATIVE_PROFILING_BEGIN
+13:47:11.656 (656981761)|CUMULATIVE_PROFILING|No profiling information for SOQL operations
+13:47:11.656 (656981761)|CUMULATIVE_PROFILING|No profiling information for SOSL operations
+13:47:11.656 (656981761)|CUMULATIVE_PROFILING|No profiling information for DML operations
+13:47:11.656 (656981761)|CUMULATIVE_PROFILING|method invocations|
+External entry point: public void invoke(): executed 1 time in 14 ms
+Trigger.gmt.AccountTrigger: line 6, column 1: global public Object keySet(): executed 24 times in 0 ms
+Trigger.gmt.AccountTrigger: line 7, column 1: global public List<ANY>(): executed 16 times in 0 ms
+
+13:47:11.656 (656981761)|CUMULATIVE_PROFILING_END
