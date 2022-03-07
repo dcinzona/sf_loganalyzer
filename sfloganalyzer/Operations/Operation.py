@@ -1,7 +1,10 @@
+import base64
+import pprint
 from .EntryOrExit import EntryPoints, ExitPoints
 from .OpUtils import dynamicDict
 from .LogLine import LogLine
 from pprint import pformat
+import sfloganalyzer.options as options
 
 
 class kLimit:
@@ -60,11 +63,12 @@ class Operation(dynamicDict):
     LIMIT_USAGE_FOR_NS = []
     PREV_OPERATION: "Operation" = None
     NEXT_OPERATION: "Operation" = None
-
     color = "#FFFFFF"
+    idx: int = 0
 
-    # static properties
-    REDACT: bool = False
+    @property
+    def idx_label(self) -> str:
+        return f"{self.idx + 1}"
 
     # def __init__(self, *args, **kwargs):
     #     super(dynamicDict, self).__init__(*args, **kwargs)
@@ -101,7 +105,7 @@ class Operation(dynamicDict):
                     obj["nodeId"] = self.nodeId
                 elif k == "ll":
                     obj["logline"] = f"[{self.lineNumber}] {v.line}"
-                elif isinstance(v, dynamicDict):
+                elif isinstance(v, Operation):
                     obj[k] = {v.__class__.__name__: f"[{v.lineNumber}] {v.eventId}"}
                 else:
                     obj[k] = v  # type(v)
@@ -118,7 +122,7 @@ class Operation(dynamicDict):
         Returns:
             _type_: _description_
         """
-        if Operation.REDACT:
+        if options.redact:
             return self.nodeId
         escStr = self.name.replace("<", "&lt;").replace(">", "&gt;")
         # some exceptions will have too much detail after the first ':' so we strip after the first ':'
@@ -194,3 +198,25 @@ class Operation(dynamicDict):
             # return 'exceptions'
             return ""  # always display errors / exceptions
         return "Unknown"
+
+    @classmethod
+    def print(cls):
+        cp = cls.__dict__.copy()
+        if "parent" in cp:
+            cp.pop("parent")
+        if "tokens" in cp:
+            cp.pop("tokens")
+        if "lineSplit" in cp:
+            cp.pop("lineSplit")
+        pprint.pp(cp)
+
+    @property
+    def nodeId(self):
+        if self.get("_nodeId", None) is None:
+            name = self.uniqueName
+            self._nodeId = base64.b64encode(name.encode("utf-8")).decode("utf-8")
+        return self._nodeId
+
+    @property
+    def uniqueName(self) -> str:
+        return f"{self.eventType}|{self.name}"

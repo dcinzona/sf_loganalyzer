@@ -1,5 +1,6 @@
 import os
 import sfloganalyzer.Operations as Operations
+import sfloganalyzer.options as options
 
 
 class reader:
@@ -14,15 +15,14 @@ class reader:
         return list(reversed(self.loglines))
 
     def __init__(self, **kwargs):
-        self.options = Operations.dynamicDict(kwargs)
-        self.logfile = self.options.logfile
+        self.logfile = options.logfile
         self.loglines = []
         self.lineCount = 0
         self.operations = []
         self.logpath = os.path.abspath(self.logfile)
         self.filename = os.path.basename(self.logpath)
         self.inputfileDir = os.path.dirname(os.path.abspath(self.logpath))
-        self.factory = Operations.OperationFactory(**self.options)
+        self.factory = Operations.OperationFactory()
         self.operations = self.factory.OPERATIONS
         self.limitUsageLines = []
         self.clusters = []
@@ -123,8 +123,8 @@ class reader:
                         op_ns = op.namespace
                         op.LIMIT_USAGE_FOR_NS = cluster.data.get(op_ns, [])
 
-                        print(op_ns) if self.options.debug else None
-                        print(op.LIMIT_USAGE_FOR_NS[0]) if self.options.debug else None
+                        print(op_ns) if options.debug else None
+                        print(op.LIMIT_USAGE_FOR_NS[0]) if options.debug else None
                     if op.get("cluster", None) is None:
                         op.cluster = cluster
                         op.clusterId = op.cluster.id
@@ -132,7 +132,7 @@ class reader:
 
                     print(
                         f"\t[{op.lineNumber}] {op.name} | {op.clusterId}"
-                    ) if self.options.debug else None
+                    ) if options.debug else None
 
             for op in self.operations:
                 if op.get("clusterId", None) is None:
@@ -148,11 +148,11 @@ class reader:
                                 f"\t[{op.lineNumber}] {op.name} | {op.clusterId} | {op.nodeId}"
                             )
                 else:
-                    print(op.nodeId) if self.options.debug else None
+                    print(op.nodeId) if options.debug else None
 
             self.clusters = list(filter(lambda n: len(n.operations) > 0, self.clusters))
 
-        if self.options.debug:
+        if options.debug:
             openOps = 0
             opCountsByType = {}
             for idx, op in enumerate(self.operations):

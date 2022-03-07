@@ -1,5 +1,4 @@
-import pprint
-import base64
+from typing import Any
 
 
 class dynamicDict(dict):
@@ -17,27 +16,24 @@ class dynamicDict(dict):
     def from_dict(cls, d: dict):
         return cls(d)
 
-    @classmethod
-    def print(cls):
-        cp = cls.__dict__.copy()
-        if "parent" in cp:
-            cp.pop("parent")
-        if "tokens" in cp:
-            cp.pop("tokens")
-        if "lineSplit" in cp:
-            cp.pop("lineSplit")
-        pprint.pp(cp)
 
-    @property
-    def nodeId(self):
-        if self.get("_nodeId", None) is None:
-            if "eventType" not in self.keys() or self.eventType is None:
-                cp = self.__dict__.copy()
-                cp.pop("parent")
-                cp.pop("lineSplit")
-                cp.pop("tokens")
-                print(cp.__str__())
-                exit()
-            name = f"{self.eventType}|{self.name}"
-            self._nodeId = base64.b64encode(name.encode("utf-8")).decode("utf-8")
-        return self._nodeId
+class dynamicObj(object):
+    """Core class for creating operations.
+
+    Args:
+        dict (_type_): _description_
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(dynamicObj, self).__init__(*args, **kwargs)
+
+    def __getattr__(self, __name: str) -> Any:
+        setattr(self, __name, dynamicObj())
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        for k, v in d.items():
+            if isinstance(v, dict):
+                setattr(cls, k, dynamicObj.from_dict(v))
+            else:
+                setattr(cls, k, v)

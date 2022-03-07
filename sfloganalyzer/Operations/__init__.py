@@ -4,7 +4,7 @@ from .Operation import Operation
 from .OperationFactory import OperationsList, OperationFactory
 from .LogLine import LogLine, SOQLQueryLogLine
 from .LogData import LogData
-from .OpUtils import dynamicDict
+from .OpUtils import dynamicDict, dynamicObj
 from .Invocations import (
     FatalErrorOp,
     FlowOperation,
@@ -27,6 +27,7 @@ __all__ = [
     "LogLine",
     "SOQLQueryLogLine",
     "dynamicDict",
+    "dynamicObj",
     "LogData",
     "FlowOperation",
     "CalloutOperation",

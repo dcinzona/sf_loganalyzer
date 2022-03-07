@@ -1,6 +1,7 @@
 from sfloganalyzer.Operations.Operation import Operation
 from sfloganalyzer.Operations.OperationFactory import OperationsList
 import sfloganalyzer.Operations.Invocations as OPS
+import sfloganalyzer.options as options
 
 
 class nodeArgs(dict):
@@ -27,9 +28,8 @@ class Node:
     opList: OperationsList
     options: dict
 
-    def __init__(self, opList: OperationsList, options: dict):
+    def __init__(self, opList: OperationsList):
         Node.opList = opList
-        Node.options = options
 
     def BuildNode(self, op: Operation, **kwargs):
         # create and style the nodes
@@ -51,7 +51,7 @@ class Node:
             fillcolor=self.lighten(op.color, 0.7),
             # tooltip=f"OPERATION:{tooltip}" if tooltip is not None else None,
         )
-        if Node.options.format == "dot":
+        if options.format == "dot":
             return args
 
         tooltip = self._buildNodeTooltipForOp(op)
@@ -64,7 +64,7 @@ class Node:
         return args
 
     def _getOpName(self, op: Operation) -> str:
-        if not Node.options.redact:
+        if not options.redact:
             return op.safeName
         return op.safeName if isinstance(op, OPS.FatalErrorOp) else f"UID: {op.nodeId}"
 
@@ -97,7 +97,7 @@ class Node:
         edge.head = headNodeId
         edge.label = label
 
-        if Node.options.format == "svg":
+        if options.format == "svg":
             tooltip = self._buildEdgeTooltip(op)
             edge["tooltip"] = tooltip
             edge["labeltooltip"] = tooltip
@@ -110,10 +110,10 @@ class Node:
         return edge
 
     def _getOpNodeId(self, op: Operation) -> str:
-        return op.nodeId if Node.options.useloops else f"{op.idx}{op.nodeId}"
+        return op.nodeId if options.useloops else f"{op.idx}{op.nodeId}"
 
     def _buildEdgeTooltip(self, op: Operation) -> str:
-        if Node.options.format == "dot":
+        if options.format == "dot":
             return None
         if op.PREV_OPERATION is None:
             return None
@@ -125,7 +125,7 @@ class Node:
         return tt
 
     def _buildNodeTooltipForOp(self, op: Operation) -> str:
-        if Node.options.format == "dot":
+        if options.format == "dot":
             return None
         tt = "\n  LogLine: [{}]".format(op.lineNumber)
         tt += "\n  Type: {}".format(op.eventType)
@@ -134,9 +134,9 @@ class Node:
         return tt
 
     def _buildLimitsString(self, op: Operation) -> str:
-        if Node.options.format == "dot":
+        if options.format == "dot":
             return None
-        if op is None or not op.isClusterOp or Node.options.strict:
+        if op is None or not op.isClusterOp or options.strict:
             return ""
 
         return "\n\nLimits Usage Data:\nNamespace: {}\n  {}".format(

@@ -1,9 +1,9 @@
-from pprint import pp
 from typing import Type
 import sfloganalyzer.Operations.Invocations as OPS
 from .Invocations.FatalError import FatalErrorOp
 from .LogLine import LogLine
 from .Operation import Operation
+import sfloganalyzer.options as options
 
 
 class OperationsList(list["Operation"]):
@@ -39,6 +39,30 @@ class OperationsList(list["Operation"]):
             clusterOps[-1].clusterId if len(clusterOps) > 0 else op.get("clusterId", "")
         )
 
+    def get_idx_from_first_op_or_self(self, input_op: Operation) -> int:
+        for op in self:
+            if op.uniqueName == input_op.uniqueName:
+                return op.idx
+        return input_op.idx
+
+    def next_op(self, op: Operation):
+        """
+        Returns the next operation in the stack
+        """
+        idx = op.idx
+        if idx == len(self) - 1:
+            return None
+        return self[idx + 1]
+
+    def prev_op(self, op: Operation):
+        """
+        Returns the previous operation in the stack
+        """
+        idx = op.idx
+        if idx == 0:
+            return None
+        return self[idx - 1]
+
 
 class OperationFactory:
     """Manages the operations stack and instantiates the appropriate operation type"""
@@ -49,13 +73,13 @@ class OperationFactory:
     def __init__(self, *args, **kwargs):
         self.OPERATIONS = OperationsList([])
         self.hitException = False
-        self.excluded_ops = kwargs.get("exclude", ())
+        self.excluded_ops = options.exclude
         # default exclusions until implemented
         self.excluded_ops = (
             *self.excluded_ops,
             *tuple(["dml", "execution", "callout"]),
         )
-        self.stop_on_exception = kwargs.get("stop-on-exception", False)
+        self.stop_on_exception = options.stop_on_exception
 
     def _excluded(self, optype: str):
         return optype in self.excluded_ops
@@ -128,16 +152,13 @@ class OperationFactory:
                 self.hitException = True
                 op = FatalErrorOp(logLine)
                 op.finished = True
+                if op.uniqueName == self.OPERATIONS[-1].uniqueName:
+                    return op  # don't append to the stack since this is probably a duplicate
 
-            prev = self.OPERATIONS[-1] if len(self.OPERATIONS) > 0 else None
             if op is not None and op.finished:
-                if op.get("parent", None) is None and prev is not None:
-                    if prev.eventId == op.eventId:
-                        return None
-                    op.parent = prev
-                else:
-                    op.parent = None
-
+                op.idx = len(self.OPERATIONS)
+                idx = self.OPERATIONS.get_idx_from_first_op_or_self(op)
+                op._nodeId = f"{op.__class__.__name__}({idx+1})"
                 self.appendToStack(op)
                 return op
 
@@ -149,32 +170,6 @@ class OperationFactory:
                 return op
         return None
 
-    def findInStack(self, op: Operation) -> Operation:
-        if len(self.OPERATIONS) == 0:
-            self.appendToStack(op)
-            return op
-        # loop through the stack backwards
-        for stackOp in self.OPERATIONS[::-1]:
-            if stackOp.eventId == op.eventId:
-                stackOp.update(op.__dict__)
-                return op
-            elif isinstance(op, OPS.FlowOperation) is False:
-                try:
-                    if (
-                        stackOp.name == op.name
-                        and stackOp.eventType == op.eventType
-                        and stackOp.eventSubType == op.eventSubType
-                    ):
-                        stackOp.update(op.__dict__)
-                        return op
-                except Exception as e:
-                    pp(op)
-                    pp(stackOp)
-                    raise e
-        # wasn't found in the stack so add it
-        self.appendToStack(op)
-        return None
-
     def appendToStack(self, op: Operation):
         """Every time we add an operation to the stack, set the previous operation and the next operation
            PrevOp <- op -> NextOp
@@ -182,9 +177,8 @@ class OperationFactory:
             op (Operation): The operation to add to the stack
         """
         if len(self.OPERATIONS) > 0:
-            # op.PREV_OPERATION = self.OPERATIONS[-1]
-            # self.OPERATIONS[-1].NEXT_OPERATION = op
-            pass
+            op.PREV_OPERATION = self.OPERATIONS[-1]
+            op.PREV_OPERATION.NEXT_OPERATION = op
         self.OPERATIONS.append(op)
 
     def getLastOperationOfType(self, opType: Type):

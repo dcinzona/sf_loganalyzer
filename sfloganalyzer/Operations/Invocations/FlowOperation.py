@@ -1,6 +1,7 @@
 from pprint import pp
 from ..LogLine import LogLine
 from ..Operation import LimitData, Operation
+import sfloganalyzer.options as options
 
 
 class FlowOperation(Operation):
@@ -165,6 +166,6 @@ class FlowOperation(Operation):
 
     @property
     def safeName(self):
-        if Operation.REDACT:
+        if options.redact:
             return self.nodeId
         return self.name.replace("<", "&lt;").replace(">", "&gt;")

@@ -6,15 +6,18 @@ import sys
 import traceback
 import click
 
+import sfloganalyzer.options as options
 import sfloganalyzer.parser.logfileReader as logfileReader
-from .VizUtils.Renderer import Renderer
+from .VizUtils.renderers.GraphVizRenderer import GraphVizRenderer as Renderer
+
+# import sfloganalyzer.graph.VizUtils.renderers.NetworkXRenderer as NetworkXRenderer
 
 
 class logviz:
     reader = None
 
     def __init__(self, *args, **kwargs) -> None:
-        self.useloops = False
+        self.useloops = options.useloops
         pass
 
     def run(self, *args, **kwargs):
@@ -111,7 +114,8 @@ class logviz:
 )
 @click.option("--debug", default=False, is_flag=True, help="Debug mode")
 def run(*args, **kwargs):
-    if kwargs.get("debug", False):
+    options.setOptions(**kwargs)
+    if options.debug:
         pass
     try:
         runner = logviz()
