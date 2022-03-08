@@ -1,7 +1,5 @@
-from abc import ABC
 from sfloganalyzer.Operations.Operation import Operation
 
 
-class Renderer(ABC):
-
+class Renderer(object):
     operations: list[Operation] = []

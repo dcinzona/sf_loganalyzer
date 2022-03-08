@@ -1,35 +1,42 @@
-class options:
-    """Every module should import this if it has to access options defined by the command line
-    example: `import sfloganalyzer.options as options`
-    """
+"""CLI options for sfloganalyzer
+Because the entry point for this is always the CLI, 
+we don't need to worry about different options 
+for different contexts or operations.
 
-    logfile: str = None
-    debug: bool = False
-    useloops: bool = False
-    engine: str = "dot"
-    format: str = "svg"
-    no_show: bool = False
-    strict: bool = False
-    exclude: list[str] = []
-    rankdir: str = "TB"
-    stop_on_exception: bool = False
-    redact: bool = False
+Returns: a shared options class for the context of the application
+"""
 
-    def __init__(self, **kwargs):
-        global logfile, debug, useloops, engine, format, no_show, strict, exclude, rankdir, stop_on_exception, redact
-        logfile = kwargs.get("logfile", None)
-        debug = kwargs.get("debug", False)
-        useloops = kwargs.get("useloops", False)
-        engine = kwargs.get("engine", "dot")
-        format = kwargs.get("format", "svg")
-        no_show = kwargs.get("no_show", False)
-        strict = kwargs.get("strict", False)
-        exclude = kwargs.get("exclude", [])
-        rankdir = kwargs.get("rankdir", "TB")
-        stop_on_exception = kwargs.get("stop_on_exception", False)
-        redact = kwargs.get("redact", False)
+import inspect
+import sfloganalyzer
+
+
+logfile: str = None
+debug: bool = False
+useloops: bool = False
+engine: str = "dot"
+format: str = "svg"
+no_show: bool = False
+strict: bool = False
+exclude: list[str] = []
+rankdir: str = "TB"
+stop_on_exception: bool = False
+redact: bool = False
+
+
+def __call__(**kwargs):
+    return setOptions(**kwargs)
+
+
+def set(**kwargs):
+    return setOptions(**kwargs)
 
 
 def setOptions(**kwargs):
-    global options
-    options = options(**kwargs)
+    sfloganalyzer.setOptions(**kwargs)
+
+
+def __getattr__(name):
+    if debug:
+        print(f"SFLOGANALYZER\n property:'{name}' not found in options")
+        print(f" {inspect.stack()[1][0]}")
+    return None

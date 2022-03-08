@@ -11,3 +11,12 @@ with open(os.path.join(__location__, "version.txt")) as f:
 
 if sys.version_info < (3, 8):  # pragma: no cover
     raise Exception("SF LogAnalyzer requires Python 3.8+.")
+
+
+def setOptions(**kwargs):
+    """Set options for sfla"""
+    from . import options
+
+    for k, v in kwargs.items():
+        setattr(options, k, v)
+    return options

@@ -5,7 +5,7 @@ Requires Python 3.6 or higher
 import sys
 import traceback
 import click
-
+import sfloganalyzer
 import sfloganalyzer.options as options
 import sfloganalyzer.parser.logfileReader as logfileReader
 from .VizUtils.renderers.GraphVizRenderer import GraphVizRenderer as Renderer
@@ -114,7 +114,7 @@ class logviz:
 )
 @click.option("--debug", default=False, is_flag=True, help="Debug mode")
 def run(*args, **kwargs):
-    options.setOptions(**kwargs)
+    sfloganalyzer.setOptions(**kwargs)
     if options.debug:
         pass
     try:
