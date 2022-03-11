@@ -1,4 +1,9 @@
-click
-graphviz
-pytest
+-r prod.txt
 black
+coverage
+pytest
+pytest-cov
+pre-commit
+flake8
+isort
+wheel

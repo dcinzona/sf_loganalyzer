@@ -83,7 +83,7 @@ def handle_exception(
     if not is_error_cmd:
         sys.stderr.write(f"[yellow]{SUGGEST_ERROR_COMMAND}")
 
-    # This is None if we're handling an exception for a `cci error` command.
+    # This is None if we're handling an exception for a `sfla error` command.
     if logfile_path:
         with open(logfile_path, "a") as log_file:
             traceback.print_exc(file=log_file)  # log stacktrace silently
@@ -106,12 +106,14 @@ def show_version_info():
 
 
 @click.group("main", help="")
-@click.version_option(show_version_info, message="")
+@click.version_option(show_version_info(), message="")
 def cli():
     """Top-level `click` command group."""
 
 
-@cli.command(name="version", help="Print the current version of CumulusCI")
+@cli.command(
+    name="version", help="Print the current version of Salesforce Log Analyzer"
+)
 def version():
     show_version_info()
 

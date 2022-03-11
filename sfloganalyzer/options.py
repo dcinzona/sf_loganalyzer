@@ -1,6 +1,6 @@
 """CLI options for sfloganalyzer
-Because the entry point for this is always the CLI, 
-we don't need to worry about different options 
+Because the entry point for this is always the CLI,
+we don't need to worry about different options
 for different contexts or operations.
 
 Returns: a shared options class for the context of the application
@@ -9,9 +9,11 @@ Returns: a shared options class for the context of the application
 import inspect
 import sfloganalyzer
 
-
+# common options
 logfile: str = None
 debug: bool = False
+
+# graph options
 useloops: bool = False
 engine: str = "dot"
 format: str = "svg"

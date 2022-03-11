@@ -33,7 +33,8 @@ class logviz:
             print("...Skipping system viewer")
             print("Graphviz file saved to: " + self.renderer.g.filepath)
             print(
-                f"{str(kwargs.get('format')).upper()} file saved to: {self.renderer.g.filepath}.{str(kwargs.get('format'))}"
+                f"{str(kwargs.get('format')).upper()} file saved to: \
+                {self.renderer.g.filepath}.{str(kwargs.get('format'))}"
             )
 
 
@@ -75,7 +76,7 @@ class logviz:
 @click.option(
     "-E",
     "--exclude",
-    help="Types of operations to exclude from the graph.  Never exclude errors / exceptions.\n",
+    help="Types of operations to exclude from the graph.\n",
     show_default=True,
     multiple=True,
     type=click.Choice(
@@ -87,7 +88,7 @@ class logviz:
     "--no-show",
     default=False,
     is_flag=True,
-    help="Don't show the graph in the default system viewer",
+    help="Don't automatically show the graph in the default system viewer",
 )
 @click.option(
     "--strict",

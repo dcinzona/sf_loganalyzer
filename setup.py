@@ -3,49 +3,51 @@
 
 import os.path
 import re
-from pkgutil import walk_packages
+from typing import List
 
-from setuptools import setup
+import setuptools
 
-
-def find_packages(path=["."], prefix=""):
-    yield prefix
-    prefix = prefix + "."
-    for _, name, ispkg in walk_packages(path, prefix):
-        if ispkg:
-            yield name
-
+packages = [
+    p
+    for p in setuptools.find_namespace_packages()
+    if p.startswith("sfloganalyzer") and not p.startswith("sfloganalyzer.docs")
+]
 
 with open(os.path.join("sfloganalyzer", "version.txt"), "r") as version_file:
     version = version_file.read().strip()
 
-with open("README.rst", "rb") as readme_file:
-    readme = readme_file.read().decode("utf-8")
 
-with open("HISTORY.rst", "rb") as history_file:
-    history = history_file.read().decode("utf-8")
-
-with open("requirements/prod.txt") as requirements_file:
+def parse_requirements_file(requirements_file) -> List[str]:
     requirements = []
     for req in requirements_file.read().splitlines():
         # skip comments and hash lines
-        if re.match(r"\s*#", req) or re.match(r"\s*--hash", req):
-            continue
-        else:
+        if not (re.match(r"\s*#", req) or re.match(r"\s*--hash", req)):
             req = req.split(" ")[0]
             requirements.append(req)
+    return requirements
 
-setup(
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+with open("requirements/prod.txt") as requirements_file:
+    requirements = parse_requirements_file(requirements_file)
+
+with open("requirements/dev.txt") as dev_requirements_file:
+    dev_requirements = parse_requirements_file(dev_requirements_file)
+
+setuptools.setup(
     name="sfloganalyzer",
     version=version,
     description="Salesforce log analysis utility",
-    long_description=readme + "\n\n" + history,
-    long_description_content_type="text/x-rst",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Gustavo Tandeciarz",
     author_email="",
     url="https://github.com/dcinzona/sf_loganalyzer",
-    packages=list(find_packages(["sfloganalyzer"], "sfloganalyzer")),
+    packages=packages,  # list(find_packages(["sfloganalyzer"], "sfloganalyzer")),
     package_dir={"sfloganalyzer": "sfloganalyzer"},
+    scripts=["bin/sfla"],
     entry_points={
         "console_scripts": [
             "sfla=sfloganalyzer.cli.sfla:main",
@@ -53,6 +55,8 @@ setup(
     },
     include_package_data=True,
     install_requires=requirements,
+    tests_require=dev_requirements,
+    data_files=[("requirements", ["requirements/prod.txt", "requirements/dev.txt"])],
     license="BSD license",
     zip_safe=False,
     keywords="sfloganalyzer",
@@ -60,11 +64,9 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
     test_suite="sfloganalyzer.tests",
-    python_requires=">=3.8",
+    python_requires=">=3.9.10",
 )

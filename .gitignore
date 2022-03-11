@@ -44,6 +44,10 @@ $RECYCLE.BIN/
 package-lock.json
 .cci/
 .vscode/
+# Python egg metadata, regenerated from source files by setuptools.
+dist/
+/*.egg-info
+/*.egg
 
 # Byte-compiled / optimized / DLL files
 **__pycache__/**
