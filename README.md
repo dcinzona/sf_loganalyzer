@@ -30,7 +30,11 @@ Options: `py -m sfloganalyzer render --help`
 
 **Using Make**
 
-Install dev dependencies: `make dev-install`
+Install dev dependencies:
+
+```python
+make dev-install
+```
 
 Run the script: `sfla render [options] [logfile]` or `sfla soql [logfile]`
 
@@ -42,6 +46,7 @@ _TODO_
 4. D3 or similar interactive html output
 5. Convert to installable package
 6. Test on Windows (currently tested on Mac OS)
+7. (MM) Create an Object focused visualization graph (where you see object by object what gets called)
 
 _Additional Resources_
 

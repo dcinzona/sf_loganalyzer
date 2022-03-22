@@ -3,9 +3,9 @@ update-deps:
 	pip-compile --upgrade --allow-unsafe requirements/dev.in
 
 dev-install:
-	pip install --upgrade pip-tools
+	python -m pip install --upgrade pip pip-tools setuptools
 	pip-sync requirements/*.txt
-	pip install -e .
+	python -m pip install -e .
 
 coverage:
 	pytest --cov --cov-report=html

@@ -2,16 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import os.path
+from pkgutil import walk_packages
 import re
 from typing import List
 
 import setuptools
 
-packages = [
-    p
-    for p in setuptools.find_namespace_packages()
-    if p.startswith("sfloganalyzer") and not p.startswith("sfloganalyzer.docs")
-]
+
+def find_packages(path=["."], prefix=""):
+    yield prefix
+    prefix = prefix + "."
+    for _, name, ispkg in walk_packages(path, prefix):
+        if ispkg:
+            yield name
+
 
 with open(os.path.join("sfloganalyzer", "version.txt"), "r") as version_file:
     version = version_file.read().strip()
@@ -45,9 +49,9 @@ setuptools.setup(
     author="Gustavo Tandeciarz",
     author_email="",
     url="https://github.com/dcinzona/sf_loganalyzer",
-    packages=packages,  # list(find_packages(["sfloganalyzer"], "sfloganalyzer")),
+    packages=list(find_packages(["sfloganalyzer"], "sfloganalyzer")),
     package_dir={"sfloganalyzer": "sfloganalyzer"},
-    scripts=["bin/sfla"],
+    # scripts=["bin/sfla"],
     entry_points={
         "console_scripts": [
             "sfla=sfloganalyzer.cli.sfla:main",

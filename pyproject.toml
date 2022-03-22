@@ -9,6 +9,7 @@ profile = 'black'
 
 [tool.black]
 line-length = 88
+exclude = '^/(\.|dist|pybuild|venv)'
 
 [tool.pytest.ini_options]
 testpaths = "sfloganalyzer"
