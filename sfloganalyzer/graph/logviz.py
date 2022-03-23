@@ -3,6 +3,7 @@ Run via command line: python3 readlog.py [logfile] [optional:outputfilecsv]
 Requires Python 3.6 or higher
 """
 import json
+from pprint import pp
 import sys
 import traceback
 import click
@@ -39,7 +40,8 @@ class logviz:
             )
         if options.format == "json":
             print(json.dumps(self.renderer.nodes, indent=4))
-            print(json.dumps(self.renderer.edges, indent=4))
+            # print(json.dumps(self.renderer.nodes, indent=4))
+        # print(json.dumps(self.renderer.edges, indent=4))
 
 
 @click.command(name="render", help="Visualize log data.")

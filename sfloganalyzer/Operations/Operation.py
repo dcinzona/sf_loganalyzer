@@ -93,10 +93,9 @@ class Operation(dynamicDict):
             self.clusterNode = False
         super(Operation, self).__init__(self.__dict__)
 
-    def __str__(self):
+    def toDict(self):
         obj: dict = {}
         skipProps = ["parent", "children", "lineNumber", "line", "lineSplit", "cluster"]
-        # from pprint import pformat
         for k, v in self.items():
             if k not in skipProps:
                 if k == "LIMIT_USAGE_FOR_NS":
@@ -109,9 +108,11 @@ class Operation(dynamicDict):
                     obj[k] = {v.__class__.__name__: f"[{v.lineNumber}] {v.eventId}"}
                 else:
                     obj[k] = v  # type(v)
+        return obj
 
+    def __str__(self):
         # return pformat(vars(obj), indent=4, width=1)
-        return f"{self.__class__.__name__}({pformat(obj, indent=4, width=1)})"
+        return f"{self.__class__.__name__}({pformat(self.toDict(), indent=4, width=1)})"
 
     @property
     def safeName(self):
