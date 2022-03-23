@@ -72,7 +72,8 @@ class NodeUtils:
             fillcolor=self.lighten(op.color, 0.7),
         )
 
-        args["op"] = op.toDict()
+        if options.format == "json":
+            args["op"] = op.toDict()
 
         if options.format == "dot":
             return args
