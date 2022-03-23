@@ -1,17 +1,22 @@
+from typing import Any
 from sfloganalyzer.Operations.Operation import Operation
 from sfloganalyzer.Operations.OperationFactory import OperationsList
 import sfloganalyzer.Operations.Invocations as OPS
 import sfloganalyzer.options as options
 
 
-class nodeArgs(dict):
+class NodeElement(dict):
+    name: str
+    label: str
+
     def __init__(self, **kwargs):
-        super(nodeArgs, self).__init__(**kwargs)
+        super(NodeElement, self).__init__(**kwargs)
         self.__dict__ = kwargs
-        self.name = kwargs.get("name", None)
-        self.label = kwargs.get("label", None)
-        self.pop("name", None)
-        self.pop("label", None)
+        if options.format != "json":
+            self.name = kwargs.get("name", None)
+            self.label = kwargs.get("label", None)
+            self.pop("name", None)
+            self.pop("label", None)
 
     def __getattr__(self, name):
         return self.__dict__.get(name, None)
@@ -24,14 +29,30 @@ class nodeArgs(dict):
         return d
 
 
-class Node:
+class EdgeElement(dict):
+    tail: str = None
+    head: str = None
+    label: str = None
+
+    def __init__(self, **kwargs):
+        super(EdgeElement, self).__init__(**kwargs)
+
+    def __getattr__(self, name):
+        return self.__dict__.get(name, None)
+
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        super(EdgeElement, self).__setattr__(__name, __value)
+        self[__name] = __value
+
+
+class NodeUtils:
     opList: OperationsList
     options: dict
 
     def __init__(self, opList: OperationsList):
-        Node.opList = opList
+        NodeUtils.opList = opList
 
-    def BuildNode(self, op: Operation, **kwargs):
+    def BuildNode(self, op: Operation, **kwargs) -> NodeElement:
         # create and style the nodes
         nodepenwidth = "3.0" if len(op.LIMIT_USAGE_FOR_NS) > 0 else "1.0"
 
@@ -40,7 +61,7 @@ class Node:
         nodeId = self._getOpNodeId(op)
         label = f"{opName}\n{op.eventType}"
 
-        args = nodeArgs(
+        args = NodeElement(
             name=nodeId,
             label=label,
             shape="box",
@@ -49,8 +70,8 @@ class Node:
             style="filled, rounded",
             color=op.color,
             fillcolor=self.lighten(op.color, 0.7),
-            # tooltip=f"OPERATION:{tooltip}" if tooltip is not None else None,
         )
+
         if options.format == "dot":
             return args
 
@@ -68,7 +89,7 @@ class Node:
             return op.safeName
         return op.safeName if isinstance(op, OPS.FatalErrorOp) else f"UID: {op.nodeId}"
 
-    def BuildEdge(self, op: Operation, **kwargs):
+    def BuildEdge(self, op: Operation, **kwargs) -> EdgeElement:
         args = self.BuildNode(op, **kwargs)
         label = f"{op.idx + 1}"
         color = op.color if op.idx == 0 else op.PREV_OPERATION.color
@@ -87,7 +108,7 @@ class Node:
         headNodeId = self._getOpNodeId(op)
         tailurlId = f"lognode{prevNodeId}"
         headurlId = f"lognode{headNodeId}"
-        edge = nodeArgs(
+        edge = EdgeElement(
             color=color,
             penwidth=args.penwidth,
             fontcolor=fontcolor,
@@ -96,9 +117,11 @@ class Node:
         edge.tail = prevNodeId
         edge.head = headNodeId
         edge.label = label
-
+        edge.tooltip = self._buildEdgeTooltip(op)
+        edge.headurlId = headurlId
+        edge.tailurlId = tailurlId
         if options.format == "svg":
-            tooltip = self._buildEdgeTooltip(op)
+            tooltip = edge.tooltip
             edge["tooltip"] = tooltip
             edge["labeltooltip"] = tooltip
             edge["tailtooltip"] = tooltip

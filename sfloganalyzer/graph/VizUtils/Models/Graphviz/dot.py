@@ -1,7 +1,7 @@
-import graphviz
+fontname = "helveticaneue-light,Helvetica,Arial,sans-serif"
 
 
-class Node(graphviz.Node):
+class Node(object):
     def __init__(self, name, label, shape, color, style):
         self.name = name
         self.label = label

@@ -1,4 +1,4 @@
 from .Renderer import Renderer
-from .utils.RenderUtils import nodeArgs, Node
+from .utils.RenderUtils import NodeElement, EdgeElement, NodeUtils
 
-__all__ = ["Renderer", "Node", "nodeArgs"]
+__all__ = ["Renderer", "NodeUtils", "NodeElement", "EdgeElement"]

@@ -61,6 +61,8 @@ class GraphVizRenderer(Renderer):
         self.g.engine = options.engine
         self.g.attr("node", fontname="helveticaneue-light,Helvetica,Arial,sans-serif")
         self.g.attr("edge", fontname="helveticaneue-light,Helvetica,Arial,sans-serif")
+        self.nodes = []
+        self.edges = []
 
     def _addDebugToGraph(self, graph: graphviz.Digraph, **kwargs):
         if graph is not None and options.debug:
@@ -75,63 +77,72 @@ class GraphVizRenderer(Renderer):
 
     def processStack(self, opsList: OperationsList):
         self.operations = opsList
-        self.nodeUtils = RenderUtils.Node(self.operations)
-
-        if len(self.operations) == 0:
-            raise Exception("No operations found in the log file")
-
-        self._addDebugToGraph(self.g, graph_attr=self.subgraphAttrs)
-
+        self.nodeUtils = RenderUtils.NodeUtils(self.operations)
+        self._buildElements(self.g)
+        # Add the nodes and edges to the graph
         with self.g.subgraph(name="cluster_Log", graph_attr=self.subgraphAttrs) as g:
             self._addDebugToGraph(g, graph_attr=self.subgraphAttrs)
             self._clearlabels(g)
-            g.node(
-                "start",
+
+            with g.subgraph(name="cluster_STACK", graph_attr=self.subgraphAttrs) as dg:
+                # self._addDebugToGraph(g, graph_attr=self.subgraphAttrs)
+                self._clearlabels(dg)
+                self._loadNodesAndEdgesIntoGraph(dg)
+
+    def _buildElements(self, g: graphviz.Digraph) -> None:
+
+        self.nodes.append(
+            RenderUtils.NodeElement(
+                name="start",
                 label="START",
                 shape="invhouse",
                 style="filled",
                 fillcolor=self.nodeUtils.lighten("#00FF00", 0.4),
                 fontsize="16",
             )
+        )
 
-            with g.subgraph(name="cluster_STACK", graph_attr=self.subgraphAttrs) as dg:
-                # self._addDebugToGraph(g, graph_attr=self.subgraphAttrs)
-                self._clearlabels(dg)
-                self._buildGraph(dg)
+        if len(self.operations) == 0:
+            raise Exception("No operations found in the log file")
 
-            g.node(
-                "end",
+        self._addDebugToGraph(self.g, graph_attr=self.subgraphAttrs)
+
+        # Add the nodes and edges to the object lists
+        for op in self.operations:
+            try:
+                node = self.nodeUtils.BuildNode(op=op)
+                self.nodes.append(node)
+                edge = self.nodeUtils.BuildEdge(op=op)
+                self.edges.append(edge)
+            except Exception as e:
+                print(e)
+                print(f"Error processing operation {op}")
+                raise e
+
+        self.nodes.append(
+            RenderUtils.NodeElement(
+                name="end",
                 label="END",
                 shape="invhouse",
                 style="filled",
                 fillcolor=self.nodeUtils.lighten("#00FF00", 0.4),
                 fontsize="16",
             )
+        )
 
-    def _buildGraph(self, g: graphviz.Digraph) -> None:
-        subclusters = [g]
-        for op in self.operations:
-            try:
-                self._loadNodesAndEdgesIntoGraph(subclusters[-1], op)
-            except Exception as e:
-                print(f"Error processing operation {op}")
-                raise e
+        edge = self.nodeUtils.BuildEdge(self.operations[-1])
+        edge.tail = str(edge.head)
+        edge.head = "end"
+        edge.label = self.operations[-1].idx_label
+        self.edges.append(edge)
 
-    def _loadNodesAndEdgesIntoGraph(self, g: graphviz.Digraph, op: Operation) -> None:
-        nodeargs = self.nodeUtils.BuildNode(op=op)
-        g.node(nodeargs.name, nodeargs.label, **nodeargs)
-        edgeargs = self.nodeUtils.BuildEdge(op=op)
-        isLastOp = op == self.operations[-1]
-        if isLastOp:
-            self._addEdge(g, edgeargs)
-            g.edge(edgeargs.head, "end", None, **edgeargs)
-        elif op.idx == 0:
-            g.edge("start", edgeargs.head, op.idx_label, **edgeargs)
-        else:
-            self._addEdge(g, edgeargs)
-
-    def _addEdge(self, g: graphviz.Digraph, args: RenderUtils.nodeArgs) -> None:
-        g.edge(args.tail, args.head, args.label, **args)
+    def _loadNodesAndEdgesIntoGraph(self, g: graphviz.Digraph) -> None:
+        if options.format == "json":
+            return
+        for node in self.nodes:
+            g.node(node.name, node.label, **node)
+        for edge in self.edges:
+            g.edge(edge.tail, edge.head, **edge)
 
     def _printStack(
         self, prefix: str = "", inputStack: list[Operation] = None, suffix: str = ""

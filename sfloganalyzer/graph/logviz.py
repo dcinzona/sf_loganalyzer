@@ -2,6 +2,7 @@
 Run via command line: python3 readlog.py [logfile] [optional:outputfilecsv]
 Requires Python 3.6 or higher
 """
+import json
 import sys
 import traceback
 import click
@@ -26,7 +27,7 @@ class logviz:
         self.renderer = Renderer(*args, **kwargs)
         self.renderer.processStack(self.reader.operations)
         print(f"\n{len(self.reader.operations)} reader operations processed")
-        if not kwargs.get("no_show", False):
+        if not kwargs.get("no_show", False) and options.format != "json":
             print("...Loading file in default system viewer")
             self.renderer.g.view()
         else:
@@ -36,6 +37,9 @@ class logviz:
                 f"{str(kwargs.get('format')).upper()} file saved to: \
                 {self.renderer.g.filepath}.{str(kwargs.get('format'))}"
             )
+        if options.format == "json":
+            print(json.dumps(self.renderer.nodes, indent=4))
+            print(json.dumps(self.renderer.edges, indent=4))
 
 
 @click.command(name="render", help="Visualize log data.")
@@ -54,9 +58,9 @@ class logviz:
     "-f",
     "--format",
     default="svg",
-    help="Output format [svg, pdf, png]",
+    help="Output format [svg, pdf, png, json]",
     show_default=True,
-    type=click.Choice(["svg", "pdf", "png", "dot"]),
+    type=click.Choice(["svg", "pdf", "png", "dot", "json"]),
 )
 @click.option(
     "-8",
