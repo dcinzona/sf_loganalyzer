@@ -18,8 +18,8 @@ else
 endif
 
 update-deps:
-	pip-compile --upgrade --allow-unsafe requirements/prod.in
-	pip-compile --upgrade --allow-unsafe requirements/dev.in
+	pip-compile --upgrade --allow-unsafe requirements/prod.in --resolver=backtracking
+	pip-compile --upgrade --allow-unsafe requirements/dev.in --resolver=backtracking
 
 dev-install: dev-env
 	python -m pip install --upgrade pip pip-tools setuptools
